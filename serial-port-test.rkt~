@@ -1,0 +1,9 @@
+#lang racket
+
+(define port-name "/dev/tty.usbmodem1411")
+
+(system (string-append "stty -f " port-name " 115200 cs8 cread clocal")) 
+
+(define out (open-output-file port-name #:mode 'binary #:exists 'append)) 
+(define in  (open-input-file  port-name #:mode 'binary)) 
+(file-stream-buffer-mode out 'none) 
