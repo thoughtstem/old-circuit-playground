@@ -1,0 +1,38 @@
+#lang racket
+
+(require "./circuit-python-base.rkt")
+(require "./circuit-python.rkt")
+
+(provide  dim-color-by)
+
+(declare-imports 'neopixel 'digitalio)
+
+(add-setup-code
+ '(setv pixpin board.NEOPIXEL)
+ '(setv numpix 10)
+ '(setv strip (neopixel.NeoPixel pixpin numpix :brightness 0.3 :auto_write False)))
+
+(define (dim-color-by c n)
+  `[hy-SQUARE (max 0 (- (hy-DOT ,c [hy-SQUARE 0]) ,n))
+              (max 0 (- (hy-DOT ,c [hy-SQUARE 1]) ,n))
+              (max 0 (- (hy-DOT ,c [hy-SQUARE 2]) ,n))])
+
+
+(define-function (hardware-update-lights)
+  (if `(not ,(in "lights" (get state.hardware )))
+         (set state.hardware.light '[hy-SQUARE 0 0 0 0 0 0 0 0 0 0])
+         '(setv dummy "dummy"))
+            
+  (loop n 10
+    (set state.hardware.light._n
+         (get strip._n))))
+
+
+(define-function (set-light n c)
+  (set state.hardware.light._n
+       'c))
+
+(define-function (set-lights c)
+  (loop n 10
+    `(set-light n c)))
+  

@@ -1,0 +1,44 @@
+#lang racket
+
+(require "./circuit-python-base.rkt")
+(require "./circuit-python.rkt")
+
+(define (play-once file id)
+  `[hy-SQUARE [hy-SQUARE ,file ,id]])
+
+(define-syntax (define-note stx)
+  (syntax-case stx ()
+    [(_ name freq)
+     (with-syntax ()
+       #`(begin (define name freq)
+                (provide name)))]))
+
+
+
+(define-note A3	220.00)
+(define-note A#3/Bb3 233.08)
+(define-note B3	246.94)
+(define-note C4	261.63)
+(define-note C#4/Db4 277.18)
+(define-note D4	293.66)
+(define-note D#4/Eb4 311.13)
+(define-note E4	329.63)
+(define-note F4	349.23)
+(define-note F#4/Gb4 369.99)
+(define-note G4	392.00)
+(define-note G#4/Ab4 415.30)
+(define-note A4	440.00)
+(define-note A#4/Bb4 466.16)
+(define-note B4	493.88)
+(define-note C5	523.25)
+(define-note C#5/Db5 554.37)
+(define-note D5	587.33)
+(define-note D#5/Eb5 622.25)
+(define-note E5	659.25)
+(define-note F5	698.46)
+(define-note F#5/Gb5 739.99)
+(define-note G5	783.99)
+(define-note G#5/Ab5 830.61)
+(define-note A5	880.00)
+
+;END AUDIO

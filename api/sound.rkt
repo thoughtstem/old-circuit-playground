@@ -1,0 +1,141 @@
+#lang racket
+
+(require "./circuit-python-base.rkt")
+(require "./circuit-python.rkt")
+
+(provide play-once)
+
+(declare-imports 'audioio 'audiobusio 'array 'math)
+
+(add-setup-code
+ '(setv already-played-list [hy-SQUARE])
+
+ '(setv CURVE 2)
+ '(setv SCALE_EXPONENT (math.pow 10 (* CURVE -0.1)))
+
+ '(setv NUM_SAMPLES 160)
+
+    
+
+
+ '(setv mic (audiobusio.PDMIn board.MICROPHONE_CLOCK board.MICROPHONE_DATA :frequency 16000 :bit_depth 16))
+
+ '(setv samples (array.array "H" (* [hy-SQUARE 0] NUM_SAMPLES)))
+ '(mic.record samples (len samples))
+
+ '(setv input_floor (+ (normalized_rms samples) 10))
+
+ '(setv input_ceiling (+ input_floor 500))
+
+ '(setv peak 0)
+
+ '(setv SAMPLERATE 8000)
+
+ '(setv spkrenable (digitalio.DigitalInOut board.SPEAKER_ENABLE))
+ '(setv spkrenable.direction digitalio.Direction.OUTPUT)
+ '(setv spkrenable.value True))
+
+(define (play-once file id)
+  `[hy-SQUARE [hy-SQUARE ,file ,id]])
+
+(define-function (play-tone beats freq)
+  '(setv length (int (/ SAMPLERATE freq)))
+  '(setv sine_wave (array.array "H" (* [hy-SQUARE 0] length)))
+  '(for (i (range length))
+    (setv (hy-DOT sine_wave [hy-SQUARE i]) (+ (* (int (*
+                                                       (math.sin (/ (* math.pi 2 i) 18))
+                                                       (** 2 15))))
+                                              (** 2 15))))
+
+  '(setv sample (audioio.AudioOut board.SPEAKER sine_wave))
+  '(setv sample.frequency SAMPLERATE)
+  '(sample.play :loop True)  
+  '(time.sleep beats)          
+  '(sample.stop))
+
+(define-syntax (define-note stx)
+  (syntax-case stx ()
+    [(_ name freq)
+     (with-syntax ()
+       #`(begin (define name freq)
+                (provide name)))]))
+
+
+(define-note A3	220.00)
+(define-note A#3/Bb3 233.08)
+(define-note B3	246.94)
+(define-note C4	261.63)
+(define-note C#4/Db4 277.18)
+(define-note D4	293.66)
+(define-note D#4/Eb4 311.13)
+(define-note E4	329.63)
+(define-note F4	349.23)
+(define-note F#4/Gb4 369.99)
+(define-note G4	392.00)
+(define-note G#4/Ab4 415.30)
+(define-note A4	440.00)
+(define-note A#4/Bb4 466.16)
+(define-note B4	493.88)
+(define-note C5	523.25)
+(define-note C#5/Db5 554.37)
+(define-note D5	587.33)
+(define-note D#5/Eb5 622.25)
+(define-note E5	659.25)
+(define-note F5	698.46)
+(define-note F#5/Gb5 739.99)
+(define-note G5	783.99)
+(define-note G#5/Ab5 830.61)
+(define-note A5	880.00)
+
+
+(define-function (already-played id)
+  '(for (p already-played-list)
+    (if (= p id)
+        (return True)))
+  '(return False))
+    
+(define-function (play-file to-play)
+  '(setv id (hy-DOT to-play [hy-SQUARE 1]))
+  '(if (already-played id)
+      (return))
+  '(already-played-list.append id)
+  '(setv filename (hy-DOT to-play [hy-SQUARE 0]))
+  '(print (+ "playing file " filename))
+  '(setv f (open filename "rb"))
+  '(setv a (audioio.AudioOut board.A0 f))
+  '(a.play)
+  '(while a.playing
+         (setv dummy 0)))
+
+
+(define-function (constrain value floor ceiling)
+  '(return (max floor (min value ceiling))))
+
+(define-function (log_scale input_value input_min input_max output_min output_max)
+  '(setv normalized_input_value (/ (- input_value  input_min) (- input_max input_min)))
+  '(return (+ output_min (* (math.pow normalized_input_value SCALE_EXPONENT)
+                           (- output_max output_min)))))
+
+(define-function (normalized_rms values)
+  '(setv minbuf (int (mean values)))
+  '(return (math.sqrt
+           (/
+            (sum
+             (list-comp  (float (* (- sample minbuf) (- sample minbuf)))
+                         (sample values)))
+            (len values)))))
+
+(define-function (mean values)
+  '(return (/ (sum values)
+             (len values))))
+
+(define-function (mic-level )
+  '(mic.record samples (len samples))
+  '(setv magnitude (normalized_rms samples))
+  '(setv c (log_scale
+           (constrain magnitude input_floor input_ceiling)
+           input_floor
+           input_ceiling
+           0
+           10))
+  'c)

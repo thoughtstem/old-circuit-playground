@@ -1,0 +1,8 @@
+#lang racket
+
+(provide)
+
+(require "circuit-python-base.rkt")
+(require "circuit-python.rkt")
+(require "lights.rkt")
+;;add other extensions here

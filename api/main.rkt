@@ -1,0 +1,14 @@
+#lang racket
+
+(provide
+ (all-from-out "./circuit-python-base.rkt")
+ (all-from-out "./circuit-python.rkt")
+ (all-from-out "./lights.rkt")
+ (all-from-out "./sound.rkt")
+ (all-from-out "./input.rkt"))
+
+(require "./circuit-python-base.rkt")
+(require "./circuit-python.rkt")
+(require "./lights.rkt")
+(require "./sound.rkt")
+(require "./input.rkt")
