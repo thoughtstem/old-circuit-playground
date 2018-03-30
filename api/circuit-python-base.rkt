@@ -23,7 +23,8 @@
          loop
          repeat
          (rename-out [py-if if])
-        ; (rename-out [py-begin begin])
+         ;(rename-out [py-begin begin])
+         py-begin ;Causes issues to redefine begin here.  Maybe it'll work farther downstream
          (rename-out [py-random random])
          
     
@@ -96,8 +97,9 @@
   (syntax-case stx ()
     [(_ var max lines ...)
      (with-syntax ()
-       #`(quasiquote (for (var (range max))
-                       ,lines ...)))]))
+       #`(let ([var 'n])
+           (quasiquote (for (var (range max))
+                       ,lines ...))))]))
 
 (define-syntax (repeat stx)
   (syntax-case stx ()
@@ -114,7 +116,7 @@
     [(_ lines ...)
      (with-syntax ()
        #`(quasiquote (do
-                       lines ...)))]))
+                       ,lines ...)))]))
 
 
 (define-syntax-rule (define-op local-name real-name)

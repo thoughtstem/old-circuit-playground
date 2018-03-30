@@ -3,7 +3,10 @@
 (require "./circuit-python-base.rkt")
 (require "./circuit-python.rkt")
 
+
+
 (provide play-once)
+
 
 (declare-imports 'audioio 'audiobusio 'array 'math)
 
@@ -13,7 +16,7 @@
  '(setv CURVE 2)
  '(setv SCALE_EXPONENT (math.pow 10 (* CURVE -0.1)))
 
- '(setv NUM_SAMPLES 160)
+ '(setv NUM_SAMPLES 10)
 
     
 
@@ -35,8 +38,11 @@
  '(setv spkrenable.direction digitalio.Direction.OUTPUT)
  '(setv spkrenable.value True))
 
+
+
 (define (play-once file id)
   `[hy-SQUARE [hy-SQUARE ,file ,id]])
+
 
 (define-function (play-tone beats freq)
   '(setv length (int (/ SAMPLERATE freq)))
@@ -94,19 +100,6 @@
         (return True)))
   '(return False))
     
-(define-function (play-file to-play)
-  '(setv id (hy-DOT to-play [hy-SQUARE 1]))
-  '(if (already-played id)
-      (return))
-  '(already-played-list.append id)
-  '(setv filename (hy-DOT to-play [hy-SQUARE 0]))
-  '(print (+ "playing file " filename))
-  '(setv f (open filename "rb"))
-  '(setv a (audioio.AudioOut board.A0 f))
-  '(a.play)
-  '(while a.playing
-         (setv dummy 0)))
-
 
 (define-function (constrain value floor ceiling)
   '(return (max floor (min value ceiling))))
@@ -118,16 +111,22 @@
 
 (define-function (normalized_rms values)
   '(setv minbuf (int (mean values)))
+  '(setv sum 0)
+
+  '(for (i (range (len values)))
+     (setv sample (hy-DOT values [hy-SQUARE i]))
+     (setv curr (float (* (- sample minbuf) (- sample minbuf))))
+     (setv sum (+ sum curr))
+     )
+  
   '(return (math.sqrt
            (/
-            (sum
-             (list-comp  (float (* (- sample minbuf) (- sample minbuf)))
-                         (sample values)))
+            sum
             (len values)))))
 
 (define-function (mean values)
   '(return (/ (sum values)
-             (len values))))
+              (len values))))
 
 (define-function (mic-level )
   '(mic.record samples (len samples))
@@ -139,3 +138,11 @@
            0
            10))
   'c)
+
+(define-function (hardware-update-sound)
+  (set state.hardware.audio '[hy-SQUARE ])
+  (set state.hardware.mic-level (mic-level)))
+
+(add-to-hardware-update
+  '(hardware-update-sound))
+

@@ -35,4 +35,7 @@
 (define-function (set-lights c)
   (loop n 10
     `(set-light n c)))
+
+(add-to-hardware-update
+  (hardware-update-lights))
   

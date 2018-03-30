@@ -16,8 +16,7 @@
 
          declare-imports
 
-         add-setup-code
-         
+         add-to-hardware-update
          (all-from-out "./circuit-python-base.rkt"))
 
 
@@ -32,15 +31,16 @@
              `(name ,params ...))
 
            (set-setup-code!
-            (append (list (quasiquote (defn name (params ...)
-                                        (do
-                                            ;(global state)
-                                            ,lines ...)
-                                        )))
+            
+            (append (list
+                     (let ([params 'params] ...)
+                       (quasiquote (defn name (params ...)
+                                     (do
+                                         ;(global state)
+                                         ,lines ...)
+                                     ))))
 
-                    setup-code
-                    
-                    ))))]))
+                    setup-code))))]))
 
 
 (define (set-setup-code! thing)
@@ -51,6 +51,10 @@
 (define (add-setup-code . lines)
   (set-setup-code! (append setup-code lines)))
 
+(define hardware-update-code '())
+
+(define (add-to-hardware-update . lines)
+  (set! hardware-update-code (append hardware-update-code lines)))
 
 (define (set-main-loop-code! thing)
   (set! main-loop-code thing))  
@@ -116,10 +120,9 @@
            (defn hardware-update (state)
              (global strip)
             
-             (hardware-update-lights)
-            
-             ,(set state.hardware.audio '[hy-SQUARE ])
-             ,(set state.hardware.mic-level '(mic-level)))
+             
+             ,@hardware-update-code
+            )
 
           
            (defn render (state)
