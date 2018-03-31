@@ -37,7 +37,7 @@
 
 
 (define (wait t)
-  `(do (render state)
+  `(do (render)
        (time.sleep ,t)))
 
 (define (pick-random (s 0) (e 1))

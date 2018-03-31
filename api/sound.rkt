@@ -16,7 +16,7 @@
  '(setv CURVE 2)
  '(setv SCALE_EXPONENT (math.pow 10 (* CURVE -0.1)))
 
- '(setv NUM_SAMPLES 10)
+ '(setv NUM_SAMPLES 160)
 
  '(setv mic (audiobusio.PDMIn board.MICROPHONE_CLOCK board.MICROPHONE_DATA :frequency 16000 :bit_depth 16))
 

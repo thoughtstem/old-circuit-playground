@@ -6,32 +6,32 @@
 ;  Analog pin down/up events
 
 ;SETUP
-(add-setup-code
+(define (setup)
  (set state.memory.color (->rgb "green"))
  (set state.memory.blade-on #f))
 
 
 ;FUNCTIONS
-(define-function (blade-on)
+(define (blade-on)
   (loop n 10
         (set-light n (get state.memory.color))
         (wait 0.05))
   (set state.memory.blade-on #t))
 
-(define-function (blade-off)
+(define (blade-off)
   (loop n 10
         (set-light n (->rgb "black"))
         (wait 0.025))
   (set state.memory.blade-on #f))
 
 
-(define-function (flicker-fx)
+(define (flicker-fx)
   (set-lights (dim-color-by
                (get state.memory.color)
                (pick-random 0 255))))
 
 
-(define-function (clash-fx)
+(define (clash-fx)
   (play-tone 0.1 G4)
   (play-tone 0.05 A3)
   (repeat 2
@@ -40,13 +40,13 @@
           (set-lights (->rgb "red"))
           (wait 0.2)))
 
-(define-function (loud-noise)
+(define (loud-noise)
   (< 5
      (get state.hardware.mic-level)))
 
 
 ;MAIN FUNCTION
-(define-function (update)
+(define (update)
   (if (get state.memory.blade-on)
       (if (loud-noise)
           (clash-fx)
