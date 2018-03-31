@@ -6,7 +6,7 @@ import IRLib_P01_NECs
 
 mySend=IRLib_P01_NECs.IRsendNEC(board.REMOTEOUT)
 Address=0x6
-Data=int('0xff00ff') #0x1a0708f
+Data=5
 
 while True:
   print("Sending NEC code with address={}, and data={}".format(hex(Address),hex(Data)))

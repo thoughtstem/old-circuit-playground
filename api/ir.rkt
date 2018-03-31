@@ -38,32 +38,40 @@
   '(setv last-recieved-address False)
   '(setv mySend (IRLib_P01_NECs.IRsendNEC board.REMOTEOUT)))
 
+(define-function (reset-receiver)
+  '(myReceiver.recvBuffer.deinit)
+  '(myReceiver.enableIRIn))
+
 (define-function (ir-receive)
- '(global last-sent-time)
+  '(global last-sent-time)
+  '(global current-ir-number)
   '(global state)
 
   '(do
-     
-     (print "Receive")
-     (if (= last-sent-time 0) 
-         (do
-           (myReceiver.getResults)
-           (if (myDecoder.decode)
-               (do
-                 (setv last-ir-number myDecoder.value)
-                 (setv last-received-address myDecoder.address)
-                 (setv current-ir-number myDecoder.value))
-               (setv current-ir-number False))
-           (myReceiver.enableIRIn))
-         (do
-           (setv last-sent-time (- last-sent-time 1))
-           (myReceiver.getResults))))
- #;(try
-
-    ;ABOVE DO BLOCK WAS HERE.  MOVED OUT BECAUSE IT"S BROKEN SOMEHOW....????
-       
-   #;(except [hy-SQUARE]
-           (setv current-ir-number False))))
+       (if (= last-sent-time 0) 
+           (do
+               ;(print "Results??")
+               (setv can_decode False)
+               (try
+                (do
+                  
+                  (setv can_decode (myReceiver.getResults)))
+                (except [hy-SQUARE]
+                        (reset-receiver)))
+               (if (and can_decode (myDecoder.decode))
+                   (do
+                     (print "Results!!")
+                     (setv last-ir-number myDecoder.value)
+                     (print myDecoder.value)
+                     (setv last-received-address myDecoder.address)
+                     (setv current-ir-number last-ir-number)
+                     ;(print "RESETTING")
+                     (reset-receiver))
+                   #;(do
+                     ;(print "Resetting current")
+                     (setv current-ir-number False))))
+           (do
+               (setv last-sent-time (- last-sent-time 1))))))
 
 (add-main-loop-code-end
  (ir-receive))
@@ -72,15 +80,16 @@
   (syntax-case stx ()
     [(_ n lines ...)
      (with-syntax ()
-       #`(let ([n 'current-ir-number])
+       #`(let ([n 'tslib.current-ir-number])
            (add-main-loop-code-end
             `(do
-                 ,lines ...))))]))
+                 ,lines ...
+                 (setv tslib.current-ir-number False)))))]))
 
 (define-function (send-ir n)
   '(global mySend)
   '(global last-sent-time)
-  '(setv   last-sent-time 0)
+  '(setv   last-sent-time 20)
   '(print "SENDING")
   `(mySend.send ,n 0x6))
 
