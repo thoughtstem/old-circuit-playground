@@ -7,7 +7,7 @@
 ;  Reenable sound.  Memory allocation error!
 
 ;SETUP
-(add-setup-code
+(define (setup)
  (set state.memory.team-color (->rgb "blue")))
 
 ;FUNCTIONS
@@ -20,13 +20,14 @@
            #f)) 
 
 ;MAIN FUNCTION
-(define-function (update)
+(define (update)
   (if 'BUTTON_A.value       ;WART: (get state.hardware.BUTTON_A)
       (begin
         (print "Shooting")
         (set-lights (->rgb "red"))
         ;'(hardware-update state)
-        (send-ir 5))
+        (send-ir 5)
+        (print "DONE SHOOTING"))
       (set-lights (get state.memory.team-color))))
 
 (run) ;WART!

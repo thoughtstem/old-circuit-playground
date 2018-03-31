@@ -7,12 +7,11 @@
          send-ir
          )
 
-(declare-imports 'board
+(declare-imports 'sys
+                 'board
                  'time
                  'IRLibDecodeBase
                  'IRLib_P01_NECd
-                 'IRLib_P02_Sonyd
-                 'IRLib_P03_RC5d
                  'IRrecvPCI
                  'IRLib_P01_NECs)
 
@@ -39,27 +38,35 @@
   '(setv last-recieved-address False)
   '(setv mySend (IRLib_P01_NECs.IRsendNEC board.REMOTEOUT)))
 
-(add-main-loop-code-end
- '(try
-   
-   (if (= last-sent-time 0)
-       (do
-         (myReceiver.getResults)
-         (if (myDecoder.decode)
-             (do
-               (setv last-ir-number myDecoder.value)
-               (setv last-received-address myDecoder.address)
-               (setv current-ir-number myDecoder.value))
-             (setv current-ir-number False))
-         (myReceiver.enableIRIn))
-       (do
-         (setv last-sent-time (- last-sent-time 1))
-         (print last-sent-time)
-         (myReceiver.getResults)
-         ))
+(define-function (ir-receive)
+ '(global last-sent-time)
+  '(global state)
+
+  '(do
+     
+     (print "Receive")
+     (if (= last-sent-time 0) 
+         (do
+           (myReceiver.getResults)
+           (if (myDecoder.decode)
+               (do
+                 (setv last-ir-number myDecoder.value)
+                 (setv last-received-address myDecoder.address)
+                 (setv current-ir-number myDecoder.value))
+               (setv current-ir-number False))
+           (myReceiver.enableIRIn))
+         (do
+           (setv last-sent-time (- last-sent-time 1))
+           (myReceiver.getResults))))
+ #;(try
+
+    ;ABOVE DO BLOCK WAS HERE.  MOVED OUT BECAUSE IT"S BROKEN SOMEHOW....????
        
-   (except [hy-SQUARE]
+   #;(except [hy-SQUARE]
            (setv current-ir-number False))))
+
+(add-main-loop-code-end
+ (ir-receive))
 
 (define-syntax (on-ir stx)
   (syntax-case stx ()
@@ -73,7 +80,8 @@
 (define-function (send-ir n)
   '(global mySend)
   '(global last-sent-time)
-  '(setv   last-sent-time 20) ;;This is not working...
+  '(setv   last-sent-time 0)
+  '(print "SENDING")
   `(mySend.send ,n 0x6))
 
 (define-function (hardware-update-ir)

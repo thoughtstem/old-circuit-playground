@@ -4,19 +4,41 @@
 (require "./circuit-python.rkt")
 
 (provide  on-down
-          on-up)
+          on-up
+          BUTTON_A
+          BUTTON_B)
 
 (declare-imports 'board 'time 'digitalio)
 
-(add-setup-code
- '(setv BUTTON_A (digitalio.DigitalInOut board.BUTTON_A))
- '(setv BUTTON_A.direction digitalio.Direction.INPUT)
- '(setv BUTTON_A.pull digitalio.Pull.DOWN)
- '(setv BUTTON_A_prev BUTTON_A.value ))
 
+(define BUTTON_A 'BUTTON_A)
+(define BUTTON_B 'BUTTON_B)
+
+(define (init-button-a)
+  `(do
+     (setv BUTTON_A (digitalio.DigitalInOut board.BUTTON_A))
+     (setv BUTTON_A.direction digitalio.Direction.INPUT)
+     (setv BUTTON_A.pull digitalio.Pull.DOWN)
+     (setv BUTTON_A_prev BUTTON_A.value )))
+
+(define (init-button-b)
+  `(do
+     (setv BUTTON_B (digitalio.DigitalInOut board.BUTTON_B))
+     (setv BUTTON_B.direction digitalio.Direction.INPUT)
+     (setv BUTTON_B.pull digitalio.Pull.DOWN)
+     (setv BUTTON_B_prev BUTTON_B.value )))
+
+(add-setup-code
+ (init-button-a)
+ (init-button-b))
+
+
+(define-function (update-buttons)
+  '(setv BUTTON_A_prev BUTTON_A.value)
+  '(setv BUTTON_B_prev BUTTON_B.value))
 
 (add-main-loop-code-end
- '(setv BUTTON_A_prev BUTTON_A.value))
+ (update-buttons))
 
 
 (define-syntax (on-down stx)
@@ -38,12 +60,6 @@
                                             ,lines ...))))]))
 
 
-
-
-
-;Detect button down, button up, and button down/up (click)
-
-;Make sure this works with the analog pins too...
 
 
  

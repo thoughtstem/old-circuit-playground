@@ -13,6 +13,7 @@
 
 (define (id-to-hy i)
   (cond [(string=? "hy-DOT" (format "~s" i)) "."]
+        [(string=? "hy-COMMA" (format "~s" i)) ","]
         [else (format "~s" i)]))
 
 

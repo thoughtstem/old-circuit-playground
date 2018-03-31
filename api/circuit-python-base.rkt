@@ -9,10 +9,6 @@
 (provide 
          update
 
-         BUTTON_A
-         BUTTON_B
-         on
-
          wait
          
          ->rgb
@@ -150,26 +146,13 @@
 (define (py-random) '(random.random))
 
 
-
-(define BUTTON_A 'BUTTON_A)
-(define BUTTON_B 'BUTTON_B)
-
 (define (update . lines)
   `(defn update (state)
      ,@lines))
 
-
-(struct event (code))
-(define (on condition . lines)
-  
-  (event `(if ,condition
-           ,@lines
-           )))
-
-
 (define (->rgb color)
   (if (string? color)
-      `[hy-SQUARE ,@(color-lookup color)]
+      `(hy-COMMA ,@(color-lookup color))
       color))
 
 (define (color-lookup s)

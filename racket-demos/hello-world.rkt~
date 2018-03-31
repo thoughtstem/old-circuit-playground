@@ -1,0 +1,9 @@
+#lang racket
+
+(require "../api/main.rkt")
+
+
+(define-function (update)
+  (set-lights (->rgb "green")))
+
+(run) ;WART!

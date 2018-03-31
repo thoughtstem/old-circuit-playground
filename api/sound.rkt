@@ -18,9 +18,6 @@
 
  '(setv NUM_SAMPLES 10)
 
-    
-
-
  '(setv mic (audiobusio.PDMIn board.MICROPHONE_CLOCK board.MICROPHONE_DATA :frequency 16000 :bit_depth 16))
 
  '(setv samples (array.array "H" (* [hy-SQUARE 0] NUM_SAMPLES)))

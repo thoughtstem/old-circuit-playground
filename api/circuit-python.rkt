@@ -8,6 +8,7 @@
          run
 
          define-function
+         define-user-function
 
          add-setup-code
 
@@ -42,6 +43,34 @@
 
                     setup-code))))]))
 
+(define-syntax (define-user-function stx)
+  (syntax-case stx ()
+    [(_ (name params ...) lines ...)
+     (with-syntax ([name-s (syntax->datum #'name)])
+       #`(begin
+           
+           (define (name params ...)
+             `(name ,params ...))
+
+           (set-user-functions!
+            
+            (append (list
+                     (let ([params 'params] ...)
+                       (quasiquote (defn name (params ...)
+                                     (global state)
+                                     (do
+                                         
+                                         ,lines ...)
+                                     ))))
+
+                    user-functions))))]))
+
+
+(define (set-user-functions! thing)
+  (set! user-functions thing))  
+
+(define user-functions '())
+
 
 (define (set-setup-code! thing)
   (set! setup-code thing))  
@@ -67,8 +96,8 @@
 (define (add-main-loop-code-begin . lines)
   (set-main-loop-code! (append lines main-loop-code)))
 
-(define (compile-circ p)
-  (define file-name "/Volumes/CIRCUITPY/code.py")
+(define (compile-circ output p)
+  (define file-name (string-append "/Volumes/CIRCUITPY/" output))
   (with-output-to-file file-name #:exists 'replace
       (lambda () (printf (compile-py p))))
   (system (string-append "cat " file-name)))
@@ -98,12 +127,29 @@
 (define (declare-imports . things)
   (set! imports (remove-duplicates (append imports things))))
 
-(define (run)
+
+(define (user-code)
+  (list `(
+           (import tslib)
+           (import [tslib [*]])
+           
+           
+           ,@user-functions
+
+
+           (setup)
+           (while True
+                  ,@main-loop-code
+                  (hardware-update) ;Set extra values based on hardware.  Convenience things like sampling...
+                  (update)
+                  (render)))))
+
+
+(define (library-code)
   (define (to-statement x) `(import ,x))
   (define import-statements (map to-statement imports))
-
-  (compile-circ
-   (list `(
+  
+  (list `(
            ,@import-statements
 
            (setv initial-memory {hy-CURLY })
@@ -117,7 +163,8 @@
              (- (time.monotonic) start-time))
 
           
-           (defn hardware-update (state)
+           (defn hardware-update ()
+             (global state)
              (global strip)
             
              
@@ -125,8 +172,9 @@
             )
 
           
-           (defn render (state)
+           (defn render ()
              (global strip)
+             (global state)
              ,(loop n 10
                     `(setv ,(get strip._n)
                            ,(get state.hardware.light._n)))
@@ -135,12 +183,17 @@
                     (do
                         (play_file ((hy-DOT ,(get state.hardware.audio) pop)))
                       )))
+
+
+           
           
-           (while True
-                  ,@main-loop-code
-                  (hardware-update state) ;Set extra values based on hardware.  Convenience things like sampling...
-                  (update)
-                  (render state))))))
+           )))
+
+(define (run)
+  (compile-circ "tslib.py" (library-code))
+  (compile-circ "code.py"  (user-code)))
+
+
 
 
 

@@ -7,7 +7,8 @@
  (all-from-out "./sound.rkt")
  (all-from-out "./input.rkt")
  (all-from-out "./ir.rkt")
- (rename-out [py-begin begin]))
+ (rename-out [py-begin begin])
+ (rename-out [define-user-function define]))
 
 (require "./circuit-python-base.rkt")
 (require "./circuit-python.rkt")
