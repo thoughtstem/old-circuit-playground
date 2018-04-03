@@ -1,7 +1,8 @@
 #lang racket
 
 (require "./python.rkt")
-(require racket/draw)
+
+
 
 (require (for-syntax racket))
 
@@ -11,7 +12,6 @@
 
          wait
          
-         ->rgb
          pick-random
 
          get
@@ -150,14 +150,6 @@
   `(defn update (state)
      ,@lines))
 
-(define (->rgb color)
-  (if (string? color)
-      `(hy-COMMA ,@(color-lookup color))
-      color))
 
-(define (color-lookup s)
-  (define color (send the-color-database find-color s))
-  (list (send color red)
-        (send color green)
-        (send color blue)))
+
 

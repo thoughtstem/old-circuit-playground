@@ -3,36 +3,72 @@
 (require "./circuit-python-base.rkt")
 (require "./circuit-python.rkt")
 
-(provide  dim-color-by)
+(provide  on-down
+          on-up
+          BUTTON_A
+          BUTTON_B)
 
-(declare-imports 'neopixel 'digitalio)
+(declare-imports 'board 'time 'digitalio 'touchio)
+
+(define BUTTON_A 'BUTTON_A)
+(define BUTTON_B 'BUTTON_B)
+
+(define (init-button-a)
+  `(do
+     (setv BUTTON_A (digitalio.DigitalInOut board.BUTTON_A))
+     (setv BUTTON_A.direction digitalio.Direction.INPUT)
+     (setv BUTTON_A.pull digitalio.Pull.DOWN)
+     (setv BUTTON_A_prev BUTTON_A.value)))
+
+(define (init-button-b)
+  `(do
+     (setv BUTTON_B (digitalio.DigitalInOut board.BUTTON_B))
+     (setv BUTTON_B.direction digitalio.Direction.INPUT)
+     (setv BUTTON_B.pull digitalio.Pull.DOWN)
+     (setv BUTTON_B_prev BUTTON_B.value )))
+
+(define (init-pad-a1)
+  `(do
+     (setv PIN_A1 (touchio.TouchIn board.A1))
+     (setv PIN_A1_prev PIN_A1.value)))
 
 (add-setup-code
- '(setv pixpin board.NEOPIXEL)
- '(setv numpix 10)
- '(setv strip (neopixel.NeoPixel pixpin numpix :brightness 0.3 :auto_write False)))
-
-(define (dim-color-by c n)
-  `[hy-SQUARE (max 0 (- (hy-DOT ,c [hy-SQUARE 0]) ,n))
-              (max 0 (- (hy-DOT ,c [hy-SQUARE 1]) ,n))
-              (max 0 (- (hy-DOT ,c [hy-SQUARE 2]) ,n))])
+ (init-button-a)
+ (init-button-b)
+ (init-pad-a1))
 
 
-(define-function (hardware-update-lights)
-  (if `(not ,(in "lights" (get state "hardware" )))
-         (set (state "hardware" "light") '[hy-SQUARE 0 0 0 0 0 0 0 0 0 0])
-         '(setv dummy "dummy"))
-            
-  (loop n 10
-    (set (state "hardware" "light" n)
-         (get strip n))))
+(define-function (update-buttons)
+  '(setv BUTTON_A_prev BUTTON_A.value)
+  '(setv BUTTON_B_prev BUTTON_B.value)
+  '(setv PIN_A1_prev PIN_A1.value)
+  (set state.hardware.BUTTON_A 'BUTTON_A.value)
+  (set state.hardware.BUTTON_B 'BUTTON_B.value)
+  (set state.hardware.A1       'PIN_A1.value))
+
+(add-main-loop-code-end
+ (update-buttons))
 
 
-(define-function (set-light n c)
-  (set (state "hardware" "light" n)
-       'c))
+(define-syntax (on-down stx)
+  (syntax-case stx ()
+    [(_ b lines ...)
+     (with-syntax ([v (string->symbol (format "~a.value" (syntax->datum #'b)))]
+                   [p (string->symbol (format "~a_prev"  (syntax->datum #'b)))])
+       #`(add-main-loop-code-begin `(if (not (= v p))
+                                        (if v
+                                            ,lines ...))))]))
 
-(define-function (set-lights c)
-  (loop n 10
-    `(set-light n c)))
-  
+(define-syntax (on-up stx)
+  (syntax-case stx ()
+    [(_ b lines ...)
+     (with-syntax ([v (string->symbol (format "~a.value" (syntax->datum #'b)))]
+                   [p (string->symbol (format "~a_prev" (syntax->datum #'b)))])
+       #`(add-main-loop-code-begin `(if (not (= v p))
+                                        (if (not v)
+                                            ,lines ...))))]))
+
+
+
+
+ 

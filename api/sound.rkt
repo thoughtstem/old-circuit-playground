@@ -5,10 +5,11 @@
 
 
 
-(provide play-once)
+(provide play-once
+         play-riff)
 
 
-(declare-imports 'audioio 'audiobusio 'array 'math)
+(declare-imports 'audioio 'audiobusio 'array 'math 'express)
 
 (add-setup-code
  '(setv already-played-list [hy-SQUARE])
@@ -31,9 +32,10 @@
 
  '(setv SAMPLERATE 8000)
 
- '(setv spkrenable (digitalio.DigitalInOut board.SPEAKER_ENABLE))
- '(setv spkrenable.direction digitalio.Direction.OUTPUT)
- '(setv spkrenable.value True))
+; '(setv spkrenable (digitalio.DigitalInOut board.SPEAKER_ENABLE))
+; '(setv spkrenable.direction digitalio.Direction.OUTPUT)
+; '(setv spkrenable.value True)
+ )
 
 
 
@@ -42,19 +44,32 @@
 
 
 (define-function (play-tone beats freq)
+  '(express.cpx.play_tone freq beats))
+
+
+;;Old version for reference.  Now using cpx lib.  See above.
+#;(define-function (play-tone beats freq)
+  '(if (= 0 freq)
+       (do
+           (time.sleep beats)
+           (return True)))
   '(setv length (int (/ SAMPLERATE freq)))
   '(setv sine_wave (array.array "H" (* [hy-SQUARE 0] length)))
   '(for (i (range length))
-    (setv (hy-DOT sine_wave [hy-SQUARE i]) (+ (* (int (*
-                                                       (math.sin (/ (* math.pi 2 i) 18))
-                                                       (** 2 15))))
-                                              (** 2 15))))
+     ;int(math.sin(math.pi * 2 * i / 18) * (2 ** 15) + 2 ** 15)
+ 
+     (setv (hy-DOT sine_wave [hy-SQUARE i]) (int (+ (*
+                                                     (math.sin (/ (* math.pi 2 i) 18))
+                                                     (** 2 15))
+                                                    (** 2 15)))))
 
   '(setv sample (audioio.AudioOut board.SPEAKER sine_wave))
   '(setv sample.frequency SAMPLERATE)
   '(sample.play :loop True)  
   '(time.sleep beats)          
-  '(sample.stop))
+  '(sample.stop)
+  '(sample.deinit)
+  )
 
 (define-syntax (define-note stx)
   (syntax-case stx ()
@@ -89,13 +104,32 @@
 (define-note G5	783.99)
 (define-note G#5/Ab5 830.61)
 (define-note A5	880.00)
+(define-note REST 0)
 
 
-(define-function (already-played id)
-  '(for (p already-played-list)
-    (if (= p id)
-        (return True)))
-  '(return False))
+(define-syntax (define-riff stx)
+  (syntax-case stx ()
+    [(_ name (note beats) ...)
+     (with-syntax ()
+       #`(begin (define name
+                  `[hy-COMMA
+                    [hy-COMMA ,note beats]
+                    ...])
+                (provide name)))]))
+
+(define-riff jingle1
+  (C4 0.125)
+  (D4 0.125)
+  (E5 0.125)
+  (F5 0.125)
+  (G5 0.125)
+  (A5 0.125))
+
+
+(define-function (play-riff riff)
+  '(for (note riff)
+    (play-tone (hy-DOT note [hy-SQUARE 1])
+               (hy-DOT note [hy-SQUARE 0])) ))
     
 
 (define-function (constrain value floor ceiling)
@@ -143,3 +177,8 @@
 (add-to-hardware-update
   '(hardware-update-sound))
 
+(define-function (already-played id)
+  '(for (p already-played-list)
+    (if (= p id)
+        (return True)))
+  '(return False))

@@ -1,0 +1,19 @@
+#lang racket
+
+(require "./circuit-python-base.rkt")
+(require "./circuit-python.rkt")
+
+(provide pin-write)
+
+(declare-imports 'board 'time 'digitalio)
+
+(define-function (pin-write pin val)
+  `(setv p (digitalio.DigitalInOut ,pin))
+  `(setv p.direction digitalio.Direction.OUTPUT)
+  `(setv p.value ,val)
+  )
+
+
+
+
+ 
