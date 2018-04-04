@@ -14,8 +14,8 @@
 
 (add-setup-code
  '(setv pixpin board.NEOPIXEL)
- '(setv numpix 10)
- '(setv strip (neopixel.NeoPixel pixpin numpix :brightness 0.3 :auto_write False)))
+ '(setv express.cpx.pixels.auto_write #f)
+ '(setv express.cpx.pixels.brightness 1))
 
 (define (dim-color-by c n)
   `[hy-SQUARE (max 0 (- (hy-DOT ,c [hy-SQUARE 0]) ,n))
@@ -30,16 +30,21 @@
             
   (loop n 10
     (set state.hardware.light._n
-         (get strip._n))))
+         '(hy-DOT express.cpx.pixels [hy-SQUARE n])))
 
+  '(express.cpx.pixels.show))
+
+(define-function (set-brightness n)
+  '(setv express.cpx.pixels.brightness n))
 
 (define-function (set-light n c)
-  (set state.hardware.light._n
-       'c))
+  '(setv (hy-DOT express.cpx.pixels [hy-SQUARE n]) ;state.hardware.light._n
+         c))
 
 (define-function (set-lights c)
   (loop n 10
-    `(set-light n c)))
+    `(set-light n c))
+  `(express.cpx.pixels.show))
 
 (add-to-hardware-update
   (hardware-update-lights))

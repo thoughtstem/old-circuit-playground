@@ -12,7 +12,7 @@
 
          wait
          
-         pick-random
+         
 
          get
          set
@@ -37,11 +37,9 @@
 
 
 (define (wait t)
-  `(do (render)
-       (time.sleep ,t)))
+  `(do (time.sleep ,t)
+       (express.cpx.pixels.show)))
 
-(define (pick-random (s 0) (e 1))
-  `(int (+ ,s (* ,e (random.random)))))
 
 (define-for-syntax (split-dots syntax)
   (define (fix-numbers s)

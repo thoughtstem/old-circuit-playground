@@ -10,6 +10,8 @@
          define-function
          define-user-function
 
+         pick-random
+
          add-setup-code
 
          add-main-loop-code-begin
@@ -19,6 +21,8 @@
 
          add-to-hardware-update
          (all-from-out "./circuit-python-base.rkt"))
+
+
 
 
 (define-syntax (define-function stx)
@@ -113,9 +117,12 @@
         [(list? x) x]
         [else (sym x)]))
 
+(define (random)
+  '(random.random))
 
-(define (rand-var-name)
-  (sym "var" (random 10000000)))
+(define-function (pick-random s e)
+  (int (+ s (* (- e s) '(random.random)))))
+
 
 (define (sym . xs)
   (define (to-string t)
@@ -130,6 +137,7 @@
 
 (define (user-code)
   (list `(
+           (import express)
            (import tslib)
            (import [tslib [*]])
            
@@ -142,7 +150,7 @@
                   ,@main-loop-code
                   (hardware-update) ;Set extra values based on hardware.  Convenience things like sampling...
                   (update)
-                  (render)))))
+                  #;(render)))))
 
 
 (define (library-code)
@@ -165,29 +173,9 @@
           
            (defn hardware-update ()
              (global state)
-             (global strip)
-            
              
              ,@hardware-update-code
-            )
-
-          
-           (defn render ()
-             (global strip)
-             (global state)
-             ,(loop n 10
-                    `(setv ,(get strip._n)
-                           ,(get state.hardware.light._n)))
-             (strip.show)
-             (while (< 0 (len ,(get state.hardware.audio)))
-                    (do
-                        (play_file ((hy-DOT ,(get state.hardware.audio) pop)))
-                      )))
-
-
-           
-          
-           )))
+            ))))
 
 (define (run)
   (compile-circ "tslib.py" (library-code))

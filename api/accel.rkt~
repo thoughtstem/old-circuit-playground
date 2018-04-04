@@ -63,6 +63,7 @@
   '(setv touch_A5_prev express.cpx.touch_A5)
   '(setv touch_A6_prev express.cpx.touch_A6)
   '(setv touch_A7_prev express.cpx.touch_A7)
+  
   (set state.hardware.BUTTON_A 'express.cpx.button_a)
   (set state.hardware.BUTTON_B 'express.cpx.button_b)
   (set state.hardware.A1       'express.cpx.touch_A1)

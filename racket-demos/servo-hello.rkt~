@@ -10,9 +10,9 @@
   (repeat 10
           (set-brightness (random))
           (set-lights c1)
-          (play-tone (+ 100 (* 300 (random))) 0.08)
+          (play-tone 0.08 (+ 100 (* 300 (random))))
           (set-lights c2)
-          (play-tone (+ 100 (* 300 (random))) 0.08)
+          (play-tone 0.08 (+ 100 (* 300 (random))))
           ))
 
 (define (destroy-effect)

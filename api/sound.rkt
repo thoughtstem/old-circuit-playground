@@ -43,7 +43,7 @@
   `[hy-SQUARE [hy-SQUARE ,file ,id]])
 
 
-(define-function (play-tone beats freq)
+(define-function (play-tone freq beats)
   '(express.cpx.play_tone freq beats))
 
 
@@ -128,8 +128,8 @@
 
 (define-function (play-riff riff)
   '(for (note riff)
-    (play-tone (hy-DOT note [hy-SQUARE 1])
-               (hy-DOT note [hy-SQUARE 0])) ))
+    (play-tone (hy-DOT note [hy-SQUARE 0])
+               (hy-DOT note [hy-SQUARE 1])) ))
     
 
 (define-function (constrain value floor ceiling)
