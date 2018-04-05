@@ -5,6 +5,7 @@
 
 
 (require (for-syntax racket))
+(require (for-syntax racket/syntax))
 
 
 (provide 
@@ -12,7 +13,7 @@
 
          wait
          
-         
+         py-set
 
          get
          set
@@ -85,6 +86,14 @@
                    [f (string->symbol (first (split-dots #'dotted-datum)))])
        #`(set2 (f r) other))]))
 
+
+(define-syntax (py-set stx)
+  (syntax-case stx ()
+    [(_ var-name other)
+     (with-syntax []
+       #`(begin
+           (set! var-name 'var-name)
+           `(setv var-name ,other)))]))
 
 
 (define-syntax (loop stx)

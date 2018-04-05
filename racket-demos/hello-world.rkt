@@ -1,12 +1,9 @@
-#lang racket
+#lang circuit-playground
 
-(require "../api/main.rkt")
+(on-start
+ (set-lights red)
+ (wait 2))
 
-(define-user-function (setup)
-  (set-lights purple)
-  )
+(forever
+  (set-lights green))
 
-(define-user-function (update)
-  #;(set-lights red))
-
-(run) ;WART!

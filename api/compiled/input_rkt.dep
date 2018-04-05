@@ -1,0 +1,1 @@
+("6.9" ("7a420154aee4edc686e8a45183c2f775e0fbd3eb" . "616bfc3415dd4aa504ea2e47e325cfce13ac6b44") (collects #"circuit-playground" #"api" #"circuit-python-base.rkt") (collects #"circuit-playground" #"api" #"circuit-python.rkt") (collects #"racket" #"main.rkt") (collects #"racket" #"runtime-config.rkt"))
