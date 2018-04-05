@@ -92,7 +92,7 @@
     [(_ var max lines ...)
      (with-syntax ()
        #`(let ([var 'n])
-           (quasiquote (for (var (range max))
+           (quasiquote (for (var (range ,max))
                        ,lines ...))))]))
 
 (define-syntax (repeat stx)

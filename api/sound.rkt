@@ -170,13 +170,6 @@
            10))
   'c)
 
-(define-function (hardware-update-sound)
-  (set state.hardware.audio '[hy-SQUARE ])
-  (set state.hardware.mic-level (mic-level)))
-
-(add-to-hardware-update
-  '(hardware-update-sound))
-
 (define-function (already-played id)
   '(for (p already-played-list)
     (if (= p id)

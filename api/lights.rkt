@@ -23,31 +23,17 @@
               (max 0 (- (hy-DOT ,c [hy-SQUARE 2]) ,n))])
 
 
-(define-function (hardware-update-lights)
-  (if `(not ,(in "lights" (get state.hardware )))
-         (set state.hardware.light '[hy-SQUARE 0 0 0 0 0 0 0 0 0 0])
-         '(setv dummy "dummy"))
-            
-  (loop n 10
-    (set state.hardware.light._n
-         '(hy-DOT express.cpx.pixels [hy-SQUARE n])))
-
-  '(express.cpx.pixels.show))
-
 (define-function (set-brightness n)
   '(setv express.cpx.pixels.brightness n))
 
 (define-function (set-light n c)
-  '(setv (hy-DOT express.cpx.pixels [hy-SQUARE n]) ;state.hardware.light._n
+  '(setv (hy-DOT express.cpx.pixels [hy-SQUARE n])
          c))
 
 (define-function (set-lights c)
   (loop n 10
     `(set-light n c))
   `(express.cpx.pixels.show))
-
-(add-to-hardware-update
-  (hardware-update-lights))
 
 
 (define (->rgb color)

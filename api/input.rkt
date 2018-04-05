@@ -52,8 +52,8 @@
 
 
 
-
-(define-function (update-buttons)
+;Can't have unnecessary code like this...
+#;(define-function (update-buttons)
   '(setv BUTTON_A_prev express.cpx.button_a)
   '(setv BUTTON_B_prev express.cpx.button_b)
   '(setv touch_A1_prev express.cpx.touch_A1)
@@ -73,7 +73,7 @@
   (set state.hardware.A6       'express.cpx.touch_A6)
   (set state.hardware.A7       'express.cpx.touch_A7))
 
-(add-main-loop-code-end
+#;(add-main-loop-code-end
  (update-buttons))
 
 

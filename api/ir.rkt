@@ -93,11 +93,13 @@
   '(print "SENDING")
   `(mySend.send ,n 0x6))
 
-(define-function (hardware-update-ir)
+#;(define-function (hardware-update-ir)
   '(global last-ir-number)
   '(global current-ir-number)
   (set state.hardware.last-ir-number 'last-ir-number)
   (set state.hardware.current-ir-number 'current-ir-number))
 
-(add-to-hardware-update
+#;(add-to-hardware-update
   '(hardware-update-ir))
+
+

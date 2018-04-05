@@ -1,55 +1,103 @@
 #lang racket
 
+(require "./circuit-python-base.rkt")
+(require "./circuit-python.rkt")
 
-import board
-import time
-import IRLibDecodeBase
-import IRLib_P01_NECd
-import IRLib_P02_Sonyd
-import IRLib_P03_RC5d
-import IRrecvPCI
+(provide on-ir
+         send-ir
+         )
 
-class MyDecodeClass(IRLibDecodeBase.IRLibDecodeBase):
-        def __init__(self):
-                IRLibDecodeBase.IRLibDecodeBase.__init__(self)
-        def  decode(self):
-                if IRLib_P01_NECd.IRdecodeNEC.decode(self): 
-                        return True
-                else:
-                        return False
+(declare-imports 'sys
+                 'board
+                 'time
+                 'IRLibDecodeBase
+                 'IRLib_P01_NECd
+                 'IRrecvPCI
+                 'IRLib_P01_NECs)
+
+(add-setup-code
+ '(defclass MyDecodeClass (IRLibDecodeBase.IRLibDecodeBase)
+   (defn __init__ (self)
+     (IRLibDecodeBase.IRLibDecodeBase.__init__ self))
+  
+   (defn decode (self)
+     (if (IRLib_P01_NECd.IRdecodeNEC.decode self) 
+         True
+         False)))
                 
-myDecoder=MyDecodeClass()
+  '(setv myDecoder (MyDecodeClass))
 
-myReceiver=IRrecvPCI.IRrecvPCI(board.REMOTEIN)
-myReceiver.enableIRIn() 
-print("send a signal")
-while True:
-   try:
-        while (not myReceiver.getResults()):
-                pass
-        if myDecoder.decode():
-                print("success")
-        else:
-                print("failed")
-        #myDecoder.dumpResults(True)
-        print("HEX?")
-        print(hex(myDecoder.value))
-        myReceiver.enableIRIn() 
-   except:
-        print("ERROR")
-        time.sleep(2)
+  '(setv myReceiver (IRrecvPCI.IRrecvPCI board.REMOTEIN))
+  
+  '(myReceiver.enableIRIn) 
+  '(setv last-ir-number False) 
+  '(setv current-ir-number False)
+  
 
+  '(setv last-sent-time False)
+  '(setv last-recieved-address False)
+  '(setv mySend (IRLib_P01_NECs.IRsendNEC board.REMOTEOUT)))
 
+(define-function (reset-receiver)
+  '(myReceiver.recvBuffer.deinit)
+  '(myReceiver.enableIRIn))
 
-import board
-import time
-import IRLib_P01_NECs
+(define-function (ir-receive)
+  '(global last-sent-time)
+  '(global current-ir-number)
+  '(global state)
 
-mySend=IRLib_P01_NECs.IRsendNEC(board.REMOTEOUT)
-Address=0x6
-Data=int('0xff00ff') #0x1a0708f
+  '(do
+       (if (= last-sent-time 0) 
+           (do
+               ;(print "Results??")
+               (setv can_decode False)
+               (try
+                (do
+                  
+                  (setv can_decode (myReceiver.getResults)))
+                (except [hy-SQUARE]
+                        (reset-receiver)))
+               (if (and can_decode (myDecoder.decode))
+                   (do
+                     (print "Results!!")
+                     (setv last-ir-number myDecoder.value)
+                     (print myDecoder.value)
+                     (setv last-received-address myDecoder.address)
+                     (setv current-ir-number last-ir-number)
+                     ;(print "RESETTING")
+                     (reset-receiver))
+                   #;(do
+                     ;(print "Resetting current")
+                     (setv current-ir-number False))))
+           (do
+               (setv last-sent-time (- last-sent-time 1))))))
 
-while True:
-  print("Sending NEC code with address={}, and data={}".format(hex(Address),hex(Data)))
-  mySend.send(Data, Address)
-  time.sleep(5)
+(add-main-loop-code-end
+ (ir-receive))
+
+(define-syntax (on-ir stx)
+  (syntax-case stx ()
+    [(_ n lines ...)
+     (with-syntax ()
+       #`(let ([n 'tslib.current-ir-number])
+           (add-main-loop-code-end
+            `(do
+                 ,lines ...
+                 (setv tslib.current-ir-number False)))))]))
+
+(define-function (send-ir n)
+  '(global mySend)
+  '(global last-sent-time)
+  '(setv   last-sent-time 20)
+  '(print "SENDING")
+  `(mySend.send ,n 0x6))
+
+(define-function (hardware-update-ir)
+  '(global last-ir-number)
+  '(global current-ir-number)
+  (set state.hardware.last-ir-number 'last-ir-number)
+  (set state.hardware.current-ir-number 'current-ir-number))
+
+(add-to-hardware-update
+  '(hardware-update-ir))

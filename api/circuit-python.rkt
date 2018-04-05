@@ -148,9 +148,8 @@
            (setup)
            (while True
                   ,@main-loop-code
-                  (hardware-update) ;Set extra values based on hardware.  Convenience things like sampling...
-                  (update)
-                  #;(render)))))
+                  ;(hardware-update) ;Set extra values based on hardware.  Convenience things like sampling...
+                  (update)))))
 
 
 (define (library-code)
@@ -161,21 +160,9 @@
            ,@import-statements
 
            (setv initial-memory {hy-CURLY })
-           (setv state {hy-CURLY "hardware" {hy-CURLY "audio" [hy-SQUARE ]}
-                                 "memory"   initial-memory})
+           (setv state {hy-CURLY "memory" initial-memory})
 
-           ,@setup-code
-
-           (setv start-time (time.monotonic))
-           (defn time-since-start ()
-             (- (time.monotonic) start-time))
-
-          
-           (defn hardware-update ()
-             (global state)
-             
-             ,@hardware-update-code
-            ))))
+           ,@setup-code)))
 
 (define (run)
   (compile-circ "tslib.py" (library-code))
