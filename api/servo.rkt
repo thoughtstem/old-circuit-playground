@@ -10,14 +10,37 @@
 
 (declare-imports 'board 'pulseio 'servo)
 
+(add-setup-code
+ '(setv output-pins [hy-SQUARE ])
+ '(setv pwms        [hy-SQUARE ]))
 
-(define-function (set-servo-f pin angle)
-  `(setv pwm (pulseio.PWMOut
+(define-function (get-pwm pin)
+  '(if (in pin output-pins)
+       (fetch-existing-pwm pin)
+       (create-new-pwm pin)))
+
+(define-function (fetch-existing-pwm pin)
+  '(setv i (output-pins.index pin))
+  '(hy-DOT pwms [hy-SQUARE i]))
+
+(define-function (create-new-pwm pin)
+  '(print "allocating new pin")
+  '(setv pwm (pulseio.PWMOut
               pin             
               :frequency 50))
+  '(pwms.append pwm)
+  '(output-pins.append pin)
+  'pwm)
+
+(define-function (free-servo-pin pin)
+  '(setv i (output-pins.index pin))
+  '(pwms.pop i)
+  '(output-pins.pop i))
+
+(define-function (set-servo-f pin angle)
+  `(setv pwm (get-pwm pin))
   `(setv s   (servo.Servo pwm))
-  `(setv s.angle angle)
-  )
+  `(setv s.angle angle))
 
 
 (define-syntax (set-servo stx)
@@ -35,8 +58,8 @@
                                      (string-upcase
                                       (symbol->string
                                        (syntax->datum #'p))))))]
-                    [enable-pin-p (format-id stx "enable-pin-~a"  (syntax->datum #'p))])
-       #`(begin
-           `(enable-pin-p #f)
-           `(set-servo-f cap_p ,angle)
+                    [enable-touch-p (format-id stx "enable-touch-~a"  (syntax->datum #'p))])
+       #`(list 'do
+               `(enable-touch-p #f)
+               `(set-servo-f cap_p ,angle)
            ))]))

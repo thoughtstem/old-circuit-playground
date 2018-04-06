@@ -35,25 +35,36 @@
   (define deinit      (string->symbol (format "express.cpx._touch_~a.deinit" (string-upcase (~a tval)))))
   `(do
      (if (not (= ,prev_val "DISABLE"))
-      (setv ,prev_val ,current_val))
-     #;(,deinit)  ;Nope.  Can't just clear it...  If finger is still down next time, the calibration will be off.
-     #;(setv ,hidden_val None)))
+         (setv ,prev_val ,current_val)
+         #;(print "Disabled current_val"))
+     ))
 
 ;For when we need to disable input pins, for doing output.  E.g. servo writes and pwm...
-(define-function (enable-touch-a1 yn)
-  '(setv touch_a1_prev (if yn #f "DISABLE")))
-(define-function (enable-touch-a2 yn)
-  '(setv touch_a2_prev (if yn #f "DISABLE")))
-(define-function (enable-touch-a3 yn)
-  '(setv touch_a3_prev (if yn #f "DISABLE")))
-(define-function (enable-touch-a4 yn)
-  '(setv touch_a4_prev (if yn #f "DISABLE")))
-(define-function (enable-touch-a5 yn)
-  '(setv touch_a5_prev (if yn #f "DISABLE")))
-(define-function (enable-touch-a6 yn)
-  '(setv touch_a6_prev (if yn #f "DISABLE")))
-(define-function (enable-touch-a7 yn)
-  '(setv touch_a7_prev (if yn #f "DISABLE")))
+(define-syntax (enable-touch stx)
+  (syntax-case stx ()
+    [(_ pin)
+     (with-syntax ([touch_p_prev (string->symbol (format "touch_~a_prev"  (syntax->datum #'pin)))]
+                   [enable-touch-p (string->symbol (format "enable-touch-~a"  (syntax->datum #'pin)))]
+                   [deinit (string->symbol (format "express.cpx._touch_~a.deinit" (string-upcase (symbol->string (syntax->datum #'pin)))))]
+                   [hidden_val (string->symbol (format "express.cpx._touch_~a" (string-upcase (symbol->string (syntax->datum #'pin)))))])
+       #`(define-function (enable-touch-p yn)
+           '(global touch_p_prev)
+           '(if (not yn)
+                (do
+                    (if hidden_val
+                        (do
+                          (deinit)
+                          (setv hidden_val None)))
+                  (setv touch_p_prev "DISABLE"))
+                (setv touch_p_prev #f))))]
+    [(_ pins ...)
+     (with-syntax ()
+       #`(begin
+           (enable-touch pins)
+           ...))]))
+
+
+(enable-touch a1 a2 a3 a4 a5 a6 a7)
 
 
 (define-function (update-buttons)

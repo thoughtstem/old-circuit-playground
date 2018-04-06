@@ -1,14 +1,15 @@
 #lang circuit-playground
 
-;Also do a demo of digital write....
-
 (define angle 90)
 
 (forever
- (set-servo output_a1 angle))  ;;Broken because set-servo isn't idempotent...  Pin in use on next frame
+  (set-servo output_a1 angle))  
 
-#;(on-down button_a
+(on-down button_a
+         (set! angle 180))
+
+(on-down button_b
          (set! angle 0))
 
-#;(on-down button_b
+(on-down touch_a7
          (set! angle 90))
