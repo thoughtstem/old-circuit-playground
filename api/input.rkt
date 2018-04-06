@@ -5,95 +5,109 @@
 
 (provide  on-down
           on-up
-          BUTTON_A
-          BUTTON_B)
+          button_a
+          button_b
+          touch_a1
+          touch_a2
+          touch_a3
+          touch_a4
+          touch_a5
+          touch_a6
+          touch_a7)
 
 (declare-imports 'board 'time 'digitalio 'touchio 'express)
 
-(define BUTTON_A 'express.cpx.button_a)
-(define BUTTON_B 'express.cpx.button_b)
+(define button_a 'express.cpx.button_a)
+(define button_b 'express.cpx.button_b)
 
-#;(define (init-button-a)
+(define touch_a1 'express.cpx.touch_A1)
+(define touch_a2 'express.cpx.touch_A2)
+(define touch_a3 'express.cpx.touch_A3)
+(define touch_a4 'express.cpx.touch_A4)
+(define touch_a5 'express.cpx.touch_A5)
+(define touch_a6 'express.cpx.touch_A6)
+(define touch_a7 'express.cpx.touch_A7)
+
+(define (cache-touch-val tval)
+  (define prev_val    (string->symbol (format "touch_~a_prev" tval)))
+  (define current_val (string->symbol (format "express.cpx.touch_~a" (string-upcase (~a tval)))))
+  (define hidden_val  (string->symbol (format "express.cpx._touch_~a" (string-upcase (~a tval)))))
+  (define deinit      (string->symbol (format "express.cpx._touch_~a.deinit" (string-upcase (~a tval)))))
   `(do
-     (setv BUTTON_A (digitalio.DigitalInOut board.BUTTON_A))
-     (setv BUTTON_A.direction digitalio.Direction.INPUT)
-     (setv BUTTON_A.pull digitalio.Pull.DOWN)
-     (setv BUTTON_A_prev BUTTON_A.value)))
+     (if (not (= ,prev_val "DISABLE"))
+      (setv ,prev_val ,current_val))
+     #;(,deinit)  ;Nope.  Can't just clear it...  If finger is still down next time, the calibration will be off.
+     #;(setv ,hidden_val None)))
 
-#;(define (init-button-b)
-  `(do
-     (setv BUTTON_B (digitalio.DigitalInOut board.BUTTON_B))
-     (setv BUTTON_B.direction digitalio.Direction.INPUT)
-     (setv BUTTON_B.pull digitalio.Pull.DOWN)
-     (setv BUTTON_B_prev BUTTON_B.value )))
+;For when we need to disable input pins, for doing output.  E.g. servo writes and pwm...
+(define-function (enable-touch-a1 yn)
+  '(setv touch_a1_prev (if yn #f "DISABLE")))
+(define-function (enable-touch-a2 yn)
+  '(setv touch_a2_prev (if yn #f "DISABLE")))
+(define-function (enable-touch-a3 yn)
+  '(setv touch_a3_prev (if yn #f "DISABLE")))
+(define-function (enable-touch-a4 yn)
+  '(setv touch_a4_prev (if yn #f "DISABLE")))
+(define-function (enable-touch-a5 yn)
+  '(setv touch_a5_prev (if yn #f "DISABLE")))
+(define-function (enable-touch-a6 yn)
+  '(setv touch_a6_prev (if yn #f "DISABLE")))
+(define-function (enable-touch-a7 yn)
+  '(setv touch_a7_prev (if yn #f "DISABLE")))
 
-(define (init-pad p)
-  ;(define board.p     (string->symbol (format "board.~a" p)))
-  (define pin_p       (string->symbol (format "touch_~a" p)))
-  (define pin_p_prev  (string->symbol (format "touch_~a_prev" p)))
-  ;(define pin_p.value (string->symbol (format "PIN_~a.value" p)))
-  (define express.cpx.touch_p (string->symbol (format "express.cpx.touch_~a" p)))
-  `(do
-     (setv ,pin_p      ,express.cpx.touch_p)
-     (setv ,pin_p_prev ,pin_p)))
 
+(define-function (update-buttons)
+  '(global button_a_prev)
+  '(global button_b_prev)
+  '(global touch_a1_prev)
+  '(global touch_a2_prev)
+  '(global touch_a3_prev)
+  '(global touch_a4_prev)
+  '(global touch_a5_prev)
+  '(global touch_a6_prev)
+  '(global touch_a7_prev)
+  '(setv button_a_prev express.cpx.button_a)
+  '(setv button_b_prev express.cpx.button_b)
+  
+  (cache-touch-val 'a1)
+  (cache-touch-val 'a2)
+  (cache-touch-val 'a3)
+  (cache-touch-val 'a4)
+  (cache-touch-val 'a5)
+  (cache-touch-val 'a6)
+  (cache-touch-val 'a7))
 
 (add-setup-code
-; (init-button-a)
-; (init-button-b)
- (init-pad 'A1)
- (init-pad 'A2)
- (init-pad 'A3)
- (init-pad 'A4)
- (init-pad 'A5)
- (init-pad 'A6)
- (init-pad 'A7))
+  '(setv button_a_prev #f)
+  '(setv button_b_prev #f)
+  '(setv touch_a1_prev #f)
+  '(setv touch_a2_prev #f)
+  '(setv touch_a3_prev #f)
+  '(setv touch_a4_prev #f)
+  '(setv touch_a5_prev #f)
+  '(setv touch_a6_prev #f)
+  '(setv touch_a7_prev #f))
+  
 
-
-
-
-;Can't have unnecessary code like this...
-#;(define-function (update-buttons)
-  '(setv BUTTON_A_prev express.cpx.button_a)
-  '(setv BUTTON_B_prev express.cpx.button_b)
-  '(setv touch_A1_prev express.cpx.touch_A1)
-  '(setv touch_A2_prev express.cpx.touch_A2)
-  '(setv touch_A3_prev express.cpx.touch_A3)
-  '(setv touch_A4_prev express.cpx.touch_A4)
-  '(setv touch_A5_prev express.cpx.touch_A5)
-  '(setv touch_A6_prev express.cpx.touch_A6)
-  '(setv touch_A7_prev express.cpx.touch_A7)
-  (set state.hardware.BUTTON_A 'express.cpx.button_a)
-  (set state.hardware.BUTTON_B 'express.cpx.button_b)
-  (set state.hardware.A1       'express.cpx.touch_A1)
-  (set state.hardware.A2       'express.cpx.touch_A2)
-  (set state.hardware.A3       'express.cpx.touch_A3)
-  (set state.hardware.A4       'express.cpx.touch_A4)
-  (set state.hardware.A5       'express.cpx.touch_A5)
-  (set state.hardware.A6       'express.cpx.touch_A6)
-  (set state.hardware.A7       'express.cpx.touch_A7))
-
-#;(add-main-loop-code-end
+(add-main-loop-code-end
  (update-buttons))
 
 
 (define-syntax (on-down stx)
   (syntax-case stx ()
     [(_ b lines ...)
-     (with-syntax ([v (string->symbol (format "express.cpx.~a" (syntax->datum #'b)))]
-                   [p (string->symbol (format "~a_prev"  (syntax->datum #'b)))])
-       #`(add-main-loop-code-begin `(if (not (= v p))
-                                        (if v
+     (with-syntax ([p (string->symbol (format "~a_prev"  (syntax->datum #'b)))])
+       #`(add-main-loop-code-begin `(if (not (= ,b p))
+                                        (if ,b
                                             (do
                                                 ,lines ...)))))]))
 
 (define-syntax (on-up stx)
   (syntax-case stx ()
     [(_ b lines ...)
-     (with-syntax ([v (string->symbol (format "express.cpx.~a" (syntax->datum #'b)))]
-                   [p (string->symbol (format "~a_prev" (syntax->datum #'b)))])
-       #`(add-main-loop-code-begin `(if (not (= v p))
-                                        (if (not v)
+     (with-syntax ([p (string->symbol (format "~a_prev" (syntax->datum #'b)))])
+       #`(add-main-loop-code-begin `(if (not (= ,b p))
+                                        (if (not ,b)
                                             (do
                                                 ,lines ...)))))]))
 

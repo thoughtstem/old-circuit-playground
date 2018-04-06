@@ -47,7 +47,12 @@
                                          ,lines ...)
                                      ))))
 
-                    setup-code))))]))
+                    setup-code))))]
+    [(_ name val)
+     (with-syntax ()
+       #`(begin
+           (define name 'name)
+           (add-global-var `(setv name ,val))))]))
 
 (define-syntax (define-user-function stx)
   (syntax-case stx ()

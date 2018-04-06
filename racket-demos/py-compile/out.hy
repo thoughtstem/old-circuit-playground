@@ -1,1 +1,1 @@
-(import express) (import tslib) (import (tslib (*))) (setv color (if True (, 0 0 255) "blue")) (defn update () (global color) (global state) (do (set-lights color))) (defn setup () (global color) (global state) (do (setv color (if True (, 255 192 203) "pink")))) (setup) (while True (ir-receive) (update))
+(import express) (import tslib) (import (tslib (*))) (setv angle 90) (defn setup () (global angle)) (defn update () (global angle) (global state) (do (set-servo-f board.A1 angle))) (setup) (while True (update-buttons) (ir-receive) (update))

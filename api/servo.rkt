@@ -1,5 +1,8 @@
 #lang racket
 
+(require (for-syntax racket))
+(require (for-syntax racket/syntax))
+
 (require "./circuit-python-base.rkt")
 (require "./circuit-python.rkt")
 
@@ -7,39 +10,33 @@
 
 (declare-imports 'board 'pulseio 'servo)
 
-(define-function (deinit-pin pin)
-  `(if (and (= pin board.A1) express.cpx._touch_A1)
-       (do (express.cpx._touch_A1.deinit)  ;FUCKING GROSS.  Shouldn't be messing with touch stuff in servo lib...
-           (setv express.cpx._touch_A1 None))
-       (and (= pin board.A2) express.cpx._touch_A2)
-       (do (express.cpx._touch_A2.deinit)  ;FUCKING GROSS
-           (setv express.cpx._touch_A2 None))
-       (and (= pin board.A3) express.cpx._touch_A3)
-       (do (express.cpx._touch_A3.deinit)  ;FUCKING GROSS
-           (setv express.cpx._touch_A3 None))
-       (and (= pin board.A4) express.cpx._touch_A4)
-       (do (express.cpx._touch_A4.deinit)  ;FUCKING GROSS
-           (setv express.cpx._touch_A4 None))
-       (and (= pin board.A5) express.cpx._touch_A5)
-       (do (express.cpx._touch_A5.deinit)  ;FUCKING GROSS
-           (setv express.cpx._touch_A5 None))
-       (and (= pin board.A6) express.cpx._touch_A6)
-       (do (express.cpx._touch_A6.deinit)  ;FUCKING GROSS
-           (setv express.cpx._touch_A6 None))
-       (and (= pin board.A7) express.cpx._touch_A7)
-       (do (express.cpx._touch_A7.deinit)  ;FUCKING GROSS
-           (setv express.cpx._touch_A7 None))))
 
-(define-function (set-servo pin angle t)
-  `(deinit-pin pin)
+(define-function (set-servo-f pin angle)
   `(setv pwm (pulseio.PWMOut
               pin             
               :frequency 50))
   `(setv s   (servo.Servo pwm))
   `(setv s.angle angle)
-  `(time.sleep t)
-  `(pwm.deinit)
   )
 
 
- 
+(define-syntax (set-servo stx)
+  (syntax-case stx ()
+    [(_ output_p angle)
+     (with-syntax* ([p (string->symbol
+                        (second
+                         (string-split
+                          (format "~a"
+                                  (syntax->datum #'output_p))
+                          "_")))]
+                    [cap_p (string->symbol
+                            (format "board.~a"
+                                    (string->symbol
+                                     (string-upcase
+                                      (symbol->string
+                                       (syntax->datum #'p))))))]
+                    [enable-pin-p (format-id stx "enable-pin-~a"  (syntax->datum #'p))])
+       #`(begin
+           `(enable-pin-p #f)
+           `(set-servo-f cap_p ,angle)
+           ))]))

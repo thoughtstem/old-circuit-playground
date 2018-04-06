@@ -1,6 +1,4 @@
-#lang racket
-
-(require "../api/main.rkt")
+#lang circuit-playground
 
 ;TODO:
 ;  Analog pin down/up events

@@ -6,4 +6,3 @@
 
 (forever
   (set-lights green))
-
