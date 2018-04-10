@@ -268,10 +268,11 @@
 
 
 (define (simple-run)
-  #;(compile-circ "tslib.py" (library-code))
   (compile-circ
    (string-append circuitpy-path "code.py")
-   (user-code)))
+   (user-code))
+   (system (string-append "touch " circuitpy-path "code.py"))
+   "Success!")
 
 (define (full-flash)
   (copy-file

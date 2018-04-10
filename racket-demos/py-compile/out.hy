@@ -1,1 +1,1 @@
-(import express) (import tslib) (import (tslib (*))) (defn update () (do (set-lights (if True (, 0 255 0) "green")))) (defn setup () (do (set-lights (if True (, 255 0 0) "red")) (do (time.sleep 2) (express.cpx.pixels.show)))) (setup) (while True (ir-receive) (update))
+(import express) (import tslib) (import (tslib (*))) (defn update () (do (set-lights (if True (, 0 0 255) "blue")))) (defn setup () (do (set-lights (if True (, 255 0 0) "red")) (do (time.sleep 2) (express.cpx.pixels.show)))) (setup) (while True (ir-receive) (update))
