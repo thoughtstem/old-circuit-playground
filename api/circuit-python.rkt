@@ -277,7 +277,7 @@
   (copy-file
    (string-append
     package-path
-    "/tools/circuitpython/atmel-samd/build-circuitplayground_express/firmware.uf2")
+    "/tools/firmware.uf2")
    (string-append cplayboot-path "firmware.uf2"))
   "Device flashing.  Wait a moment and run your program again.")
 

@@ -18,5 +18,4 @@ end
 
 system "make BOARD=circuitplayground_express FROZEN_MPY_DIR=modules/"
 `cp build-circuitplayground_express/firmware.uf2 /Volumes/CPLAYBOOT`
-
-
+`cp build-circuitplayground_express/firmware.uf2 ../../`
