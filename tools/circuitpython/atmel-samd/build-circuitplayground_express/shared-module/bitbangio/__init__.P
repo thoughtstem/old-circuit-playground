@@ -1,3 +1,0 @@
-build-circuitplayground_express/shared-module/bitbangio/__init__.o: \
- ../shared-module/bitbangio/__init__.c
- ../shared-module/bitbangio/__init__.c :

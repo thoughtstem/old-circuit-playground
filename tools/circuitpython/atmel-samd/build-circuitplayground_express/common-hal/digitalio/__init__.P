@@ -1,3 +1,0 @@
-build-circuitplayground_express/common-hal/digitalio/__init__.o: \
- common-hal/digitalio/__init__.c
- common-hal/digitalio/__init__.c :

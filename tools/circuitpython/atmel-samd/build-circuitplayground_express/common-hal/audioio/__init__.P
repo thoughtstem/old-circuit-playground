@@ -1,3 +1,0 @@
-build-circuitplayground_express/common-hal/audioio/__init__.o: \
- common-hal/audioio/__init__.c
- common-hal/audioio/__init__.c :

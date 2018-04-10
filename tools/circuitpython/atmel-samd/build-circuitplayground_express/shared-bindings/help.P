@@ -1,5 +1,0 @@
-build-circuitplayground_express/shared-bindings/help.o: \
- ../shared-bindings/help.c \
- build-circuitplayground_express/genhdr/mpversion.h
- ../shared-bindings/help.c :
- build-circuitplayground_express/genhdr/mpversion.h :

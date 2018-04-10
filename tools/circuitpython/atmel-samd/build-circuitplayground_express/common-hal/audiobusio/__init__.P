@@ -1,3 +1,0 @@
-build-circuitplayground_express/common-hal/audiobusio/__init__.o: \
- common-hal/audiobusio/__init__.c
- common-hal/audiobusio/__init__.c :
