@@ -162,7 +162,7 @@
 (define (default-package-path)
   (string-append
    (path->string (find-user-pkgs-dir))
-   "/circuit-python/"))
+   "/circuit-playground/"))
 
 (define cplayboot-path (default-cplayboot-path))
 (define circuitpy-path (default-circuitpy-path))
