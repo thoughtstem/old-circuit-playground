@@ -7,13 +7,12 @@
 
 (on-ir n
        (if (= n 5)
-           (begin
-             (print "GOT SIGNAL...")
-             (set! color red))
+           (set! color red)
            #f)) 
 
 (on-down button_a
          (set-lights blue)
+         (play-riff jingle1)
          (send-ir 5)
          (set-lights green))
 

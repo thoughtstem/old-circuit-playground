@@ -222,7 +222,7 @@
            ,@setup-code)))
 
 (define (run)
-  (compile-circ "tslib.py" (library-code))
+ ; (compile-circ "tslib.py" (library-code))
 
   (compile-circ "code.py"  (user-code)))
 

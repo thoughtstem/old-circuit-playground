@@ -13,12 +13,9 @@
           (set-lights c2)
           (wait 0.20)))
 
-
 (on-ir n
        (if (= n 5)
-           (begin
-             (print "GOT SIGNAL...")
-             (set! team-color green))
+           (set! team-color green)
            #f)) 
 
 (on-down button_a
@@ -30,6 +27,3 @@
   (if (= 0 ammo)
       (flash-effect white black)
       (set-lights team-color)))
-
-
-
