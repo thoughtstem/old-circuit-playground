@@ -1,0 +1,7 @@
+Q(__enter__)
+Q(__exit__)
+Q(deinit)
+Q(value)
+Q(raw_value)
+Q(threshold)
+Q(TouchIn)
