@@ -1,67 +1,59 @@
-#lang racket
-
-(require "../api/main.rkt")
-
-;TODO:
-;  Analog pin down/up events
+#lang circuit-playground
 
 ;SETUP
-(define (setup)
- (set state.memory.color (->rgb "green"))
- (set state.memory.blade-on #f))
+(define color green)
+(define blade-on #f)
 
 
 ;FUNCTIONS
-(define (blade-on)
+(define (blade-on-effect)
   (loop n 10
-        (set-light n (get state.memory.color))
+        (set-light n color)
         (wait 0.05))
-  (set state.memory.blade-on #t))
+  (set! blade-on #t))
 
-(define (blade-off)
+(define (blade-off-effect)
   (loop n 10
-        (set-light n (->rgb "black"))
+        (set-light n black)
         (wait 0.025))
-  (set state.memory.blade-on #f))
+  (set! blade-on #f))
 
 
 (define (flicker-fx)
   (set-lights (dim-color-by
-               (get state.memory.color)
+               color
                (pick-random 0 255))))
 
 
 (define (clash-fx)
-  (play-tone 0.1 G4)
-  (play-tone 0.05 A3)
+  (play-tone G4 0.1)
+  (play-tone A4 0.05)
   (repeat 2
-          (set-lights (->rgb "white"))
+          (set-lights white)
           (wait 0.2)
-          (set-lights (->rgb "red"))
+          (set-lights red)
           (wait 0.2)))
 
+
 (define (loud-noise)
-  (< 5
-     (get state.hardware.mic-level)))
+  (< 5 (mic-level)))
 
 
 ;MAIN FUNCTION
-(define (update)
-  (if (get state.memory.blade-on)
+(forever
+  (if blade-on
       (if (loud-noise)
           (clash-fx)
           (flicker-fx))
-      (set-lights (->rgb "black"))))
+      (set-lights black)))
 
 
 ;EVENTS
-(on-down BUTTON_A
-         (if (get state.memory.blade-on)
-             (blade-off)
-             (blade-on)))
+(on-down button_a
+         (if blade-on
+             (blade-off-effect)
+             (blade-on-effect)))
 
-
-(run) ;WART!
 
 
 

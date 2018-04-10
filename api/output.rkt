@@ -31,11 +31,10 @@
                                      (string-upcase
                                       (symbol->string
                                        (syntax->datum #'p))))))]
-                    [enable-touch-p (format-id stx "enable-touch-~a"  (syntax->datum #'p))])
+                    [p-num (string->number (substring (symbol->string (syntax->datum #'p)) 1))])
        #`(list 'do
-               `(enable-touch-p #f)
-               `(pin-write-f cap_p ,val)
-           ))]))
+             ;  `(enable-touch p-num #f)
+               `(pin-write-f cap_p ,val)))]))
 
 
 

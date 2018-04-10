@@ -1,7 +1,7 @@
 #lang racket
 
 (require "./python.rkt")
-(require "./circuit-python-base.rkt")
+;(require "./circuit-python-base.rkt")
 (require racket/draw)
 
 (provide compile-circ
@@ -22,7 +22,8 @@
          declare-imports
 
          add-to-hardware-update
-         (all-from-out "./circuit-python-base.rkt"))
+         ;(all-from-out "./circuit-python-base.rkt")
+         )
 
 
 
@@ -68,7 +69,6 @@
             (append (list
                      (let ([params 'params] ...)
                        (quasiquote (defn name (params ...)
-                                     (global state)
                                      (do
                                          
                                          ,lines ...)
@@ -147,25 +147,23 @@
 (define (compile-circ output p)
   (define file-name (string-append "/Volumes/CIRCUITPY/" output))
   (with-output-to-file file-name #:exists 'replace
-      (lambda () (printf (compile-py p))))
+      (lambda () (printf (strip-hy-imports (compile-py p)))))
   (system (string-append "cat " file-name)))
 
+(define (strip-hy-imports s)
+  (define lines (string-split s "\n"))
+  (define filtered
+    (filter (λ(x)
+              (not (regexp-match #rx"hy.core" x)))
+            lines))
+  (string-join filtered "\n"))
 
-
-(define (->string x) (format "~a" x))
-
-(define (racket->python x)
-  (cond [(and (boolean? x) x) 'True]
-        [(and (boolean? x) (not x)) 'False]
-        [(number? x) x]
-        [(list? x) x]
-        [else (sym x)]))
 
 (define (random)
   '(random.random))
 
 (define-function (pick-random s e)
-  (int (+ s (* (- e s) '(random.random)))))
+  '(int (+ s (* (- e s) (random.random)))))
 
 
 (define (sym . xs)
@@ -220,9 +218,6 @@
   
   (list `(
            ,@import-statements
-
-           (setv initial-memory {hy-CURLY })
-           (setv state {hy-CURLY "memory" initial-memory})
 
            ,@setup-code)))
 

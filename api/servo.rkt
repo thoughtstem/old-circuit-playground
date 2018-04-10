@@ -24,7 +24,6 @@
   '(hy-DOT pwms [hy-SQUARE i]))
 
 (define-function (create-new-pwm pin)
-  '(print "allocating new pin")
   '(setv pwm (pulseio.PWMOut
               pin             
               :frequency 50))
@@ -58,8 +57,8 @@
                                      (string-upcase
                                       (symbol->string
                                        (syntax->datum #'p))))))]
-                    [enable-touch-p (format-id stx "enable-touch-~a"  (syntax->datum #'p))])
+                    [p-num (string->number (substring (symbol->string (syntax->datum #'p)) 1))])
        #`(list 'do
-               `(enable-touch-p #f)
+              ; `(enable-touch p-num #f)
                `(set-servo-f cap_p ,angle)
            ))]))

@@ -91,15 +91,13 @@
   '(global last-sent-time)
   '(setv   last-sent-time 20)
   '(print "SENDING")
+  '(if (hasattr mySend "irSend")   (mySend.irSend.deinit))
+  '(if (hasattr mySend "irPWM")    (mySend.irPWM.deinit))
+  '(if express.cpx._sample         (express.cpx._sample.deinit))
+  '(if express.cpx._sample         (setv express.cpx._sample None))
+  '(if express.cpx._speaker_enable (express.cpx._speaker_enable.deinit))
+  '(if express.cpx._speaker_enable (setv express.cpx._speaker_enable None))
   `(mySend.send ,n 0x6))
 
-#;(define-function (hardware-update-ir)
-  '(global last-ir-number)
-  '(global current-ir-number)
-  (set state.hardware.last-ir-number 'last-ir-number)
-  (set state.hardware.current-ir-number 'current-ir-number))
-
-#;(add-to-hardware-update
-  '(hardware-update-ir))
 
 

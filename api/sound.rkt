@@ -12,8 +12,6 @@
 (declare-imports 'audioio 'audiobusio 'array 'math 'express)
 
 (add-setup-code
- '(setv already-played-list [hy-SQUARE])
-
  '(setv CURVE 2)
  '(setv SCALE_EXPONENT (math.pow 10 (* CURVE -0.1)))
 
@@ -31,10 +29,6 @@
  '(setv peak 0)
 
  '(setv SAMPLERATE 8000)
-
-; '(setv spkrenable (digitalio.DigitalInOut board.SPEAKER_ENABLE))
-; '(setv spkrenable.direction digitalio.Direction.OUTPUT)
-; '(setv spkrenable.value True)
  )
 
 
@@ -46,30 +40,6 @@
 (define-function (play-tone freq beats)
   '(express.cpx.play_tone freq beats))
 
-
-;;Old version for reference.  Now using cpx lib.  See above.
-#;(define-function (play-tone beats freq)
-  '(if (= 0 freq)
-       (do
-           (time.sleep beats)
-           (return True)))
-  '(setv length (int (/ SAMPLERATE freq)))
-  '(setv sine_wave (array.array "H" (* [hy-SQUARE 0] length)))
-  '(for (i (range length))
-     ;int(math.sin(math.pi * 2 * i / 18) * (2 ** 15) + 2 ** 15)
- 
-     (setv (hy-DOT sine_wave [hy-SQUARE i]) (int (+ (*
-                                                     (math.sin (/ (* math.pi 2 i) 18))
-                                                     (** 2 15))
-                                                    (** 2 15)))))
-
-  '(setv sample (audioio.AudioOut board.SPEAKER sine_wave))
-  '(setv sample.frequency SAMPLERATE)
-  '(sample.play :loop True)  
-  '(time.sleep beats)          
-  '(sample.stop)
-  '(sample.deinit)
-  )
 
 (define-syntax (define-note stx)
   (syntax-case stx ()
@@ -159,7 +129,7 @@
   '(return (/ (sum values)
               (len values))))
 
-(define-function (mic-level )
+(define-function (mic-level)
   '(mic.record samples (len samples))
   '(setv magnitude (normalized_rms samples))
   '(setv c (log_scale
@@ -170,8 +140,3 @@
            10))
   'c)
 
-(define-function (already-played id)
-  '(for (p already-played-list)
-    (if (= p id)
-        (return True)))
-  '(return False))

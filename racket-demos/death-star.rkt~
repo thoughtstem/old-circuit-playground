@@ -1,44 +1,61 @@
-#lang racket
-
-(require "../api/main.rkt")
-
-;TODO:
-;  Analog pin down/up events
-;  Reenable sound.  Memory allocation error!
+#lang circuit-playground
 
 ;SETUP
-(define (setup)
- (set state.memory.team-color blue)
- (set state.memory.ammo       3)
- (play-riff jingle1))
+(define beam-start #f)
 
-(define (flash-effect c1 c2)
-  (repeat 4
+(define (flash c1 c2)
+  (repeat 10
+          (set-brightness (random))
           (set-lights c1)
-          (wait 0.20)
+          (play-tone (+ 100 (* 300 (random))) 0.08)
           (set-lights c2)
-          (wait 0.20)))
+          (play-tone (+ 100 (* 300 (random))) 0.08)))
 
-;FUNCTIONS
-(on-ir n
-       (if (= n 5)
-           (begin
-             (print "GOT SIGNAL...")
-             (set state.memory.team-color green))
-           #f)) 
+(define (destroy-effect)
+  (flash red white)
+  (flash orange yellow)
+  (set-lights black))
 
 ;MAIN FUNCTION
-(define (update)
-  (if (= 0 (get state.memory.ammo))
-      (flash-effect white black)
-      (if (get state.hardware.BUTTON_A)       
-          (begin
-            (set state.memory.ammo
-                 (- (get state.memory.ammo)
-                    1))
-            (flash-effect red orange)
-            (send-ir 5))
-          (set-lights (get state.memory.team-color)))))
+(forever
+  (if (shake 20)
+      (destroy-effect)
+      #f))
 
-(run) ;WART!
+(on-down touch_a4
+         (set-lights green)
+         (play-tone G4 0.1)
+         (play-tone C5 0.1)
+         (pin-write PIN_A7 #t))
+
+(on-down touch_a5
+         (set-lights red)
+         (play-tone 0.1 G4)
+         (play-tone 0.1 C5)
+         (pin-write PIN_A7 #f))
+
+(on-down touch_a6
+         (repeat 10
+                 (pin-write output_a7 #t)
+                 (play-tone C5 0.1)
+                 (pin-write output_a7 #f)
+                 (play-tone C4 0.1)))
+
+(on-down touch_a3
+         (loop n 100
+                 (play-tone 0.05 (* 2 (+ 200 n)))
+                 (set-brightness (random))  
+                 (set-lights green))
+         (play-riff jingle1)
+         (set! beam-start #t))
+
+(on-down touch_a1
+         (if beam-start
+             (begin
+               (play-riff jingle1)
+               (loop n 10
+                       (set-light n black)
+                       (wait 0.25)))
+             #f))
+
 
