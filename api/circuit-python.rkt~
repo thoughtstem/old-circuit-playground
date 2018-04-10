@@ -1,7 +1,7 @@
 #lang racket
 
 (require "./python.rkt")
-(require "./circuit-python-base.rkt")
+;(require "./circuit-python-base.rkt")
 (require racket/draw)
 
 (provide compile-circ
@@ -9,6 +9,10 @@
 
          define-function
          define-user-function
+         forever
+         on-start
+
+         pick-random
 
          add-setup-code
 
@@ -18,7 +22,10 @@
          declare-imports
 
          add-to-hardware-update
-         (all-from-out "./circuit-python-base.rkt"))
+         ;(all-from-out "./circuit-python-base.rkt")
+         )
+
+
 
 
 (define-syntax (define-function stx)
@@ -41,7 +48,12 @@
                                          ,lines ...)
                                      ))))
 
-                    setup-code))))]))
+                    setup-code))))]
+    [(_ name val)
+     (with-syntax ()
+       #`(begin
+           (define name 'name)
+           (add-global-var `(setv name ,val))))]))
 
 (define-syntax (define-user-function stx)
   (syntax-case stx ()
@@ -57,19 +69,55 @@
             (append (list
                      (let ([params 'params] ...)
                        (quasiquote (defn name (params ...)
-                                     (global state)
                                      (do
                                          
                                          ,lines ...)
                                      ))))
 
-                    user-functions))))]))
+                    user-functions))))]
+    [(_ name val)
+     (with-syntax ()
+       #`(begin
+           (define name 'name)
+           (add-global-var `(setv name ,val))))]))
+
+(define-syntax (forever stx)
+  (syntax-case stx ()
+    [(_ lines ...)
+     (with-syntax ()
+       #`(define-user-function (update)
+           lines
+           ...))]))
+
+(define-syntax (on-start stx)
+  (syntax-case stx ()
+    [(_ lines ...)
+     (with-syntax ()
+       #`(define-user-function (setup)
+           lines
+           ...))]))
 
 
 (define (set-user-functions! thing)
-  (set! user-functions thing))  
+  (set! user-functions thing))
+
+(define (add-user-function f)
+  (set-user-functions! (cons f user-functions)))
 
 (define user-functions '())
+
+
+(define (set-global-vars! thing)
+  (set! global-vars thing))
+
+(define (add-global-var f)
+  (set-global-vars! (cons f global-vars)))
+
+(define global-vars '())
+
+;fns is a list of hy dfns e.g. (defn update () (print "hi") (print "HI again"))
+(define (function-names fns)
+  (map second fns))  
 
 
 (define (set-setup-code! thing)
@@ -96,26 +144,30 @@
 (define (add-main-loop-code-begin . lines)
   (set-main-loop-code! (append lines main-loop-code)))
 
+(define (output-path)
+  "/Volumes/CIRCUITPY/")
+
 (define (compile-circ output p)
-  (define file-name (string-append "/Volumes/CIRCUITPY/" output))
+  (define file-name (string-append output-path output))
   (with-output-to-file file-name #:exists 'replace
-      (lambda () (printf (compile-py p))))
+      (lambda () (printf (strip-hy-imports (compile-py p)))))
   (system (string-append "cat " file-name)))
 
+(define (strip-hy-imports s)
+  (define lines (string-split s "\n"))
+  (define filtered
+    (filter (λ(x)
+              (not (regexp-match #rx"hy.core" x)))
+            lines))
+  (string-join filtered "\n"))
 
 
-(define (->string x) (format "~a" x))
+(define (random)
+  '(random.random))
 
-(define (racket->python x)
-  (cond [(and (boolean? x) x) 'True]
-        [(and (boolean? x) (not x)) 'False]
-        [(number? x) x]
-        [(list? x) x]
-        [else (sym x)]))
+(define-function (pick-random s e)
+  '(int (+ s (* (- e s) (random.random)))))
 
-
-(define (rand-var-name)
-  (sym "var" (random 10000000)))
 
 (define (sym . xs)
   (define (to-string t)
@@ -128,21 +180,39 @@
   (set! imports (remove-duplicates (append imports things))))
 
 
+(define (add-function-if-not-there name)
+  (or  (member name (function-names user-functions))
+       (add-user-function `(defn ,name ()))))
+
+
+
+(define (shove-in-globals-1 fn)
+  (append (take fn 3)
+          (map (λ(x) `(global ,(second x))) global-vars)
+          (drop fn 3)))
+
+(define (shove-in-globals fns)
+  (map shove-in-globals-1 fns))
+
+
 (define (user-code)
+  (add-function-if-not-there 'update)
+  (add-function-if-not-there 'setup)
+  
   (list `(
+           (import express)
            (import tslib)
            (import [tslib [*]])
            
-           
-           ,@user-functions
+           ,@global-vars
+           ,@(shove-in-globals user-functions)
 
 
            (setup)
            (while True
                   ,@main-loop-code
-                  (hardware-update) ;Set extra values based on hardware.  Convenience things like sampling...
-                  (update)
-                  (render)))))
+                  ;(hardware-update) ;Set extra values based on hardware.  Convenience things like sampling...
+                  (update)))))
 
 
 (define (library-code)
@@ -152,42 +222,7 @@
   (list `(
            ,@import-statements
 
-           (setv initial-memory {hy-CURLY })
-           (setv state {hy-CURLY "hardware" {hy-CURLY "audio" [hy-SQUARE ]}
-                                 "memory"   initial-memory})
-
-           ,@setup-code
-
-           (setv start-time (time.monotonic))
-           (defn time-since-start ()
-             (- (time.monotonic) start-time))
-
-          
-           (defn hardware-update ()
-             (global state)
-             (global strip)
-            
-             
-             ,@hardware-update-code
-            )
-
-          
-           (defn render ()
-             (global strip)
-             (global state)
-             ,(loop n 10
-                    `(setv ,(get strip._n)
-                           ,(get state.hardware.light._n)))
-             (strip.show)
-             (while (< 0 (len ,(get state.hardware.audio)))
-                    (do
-                        (play_file ((hy-DOT ,(get state.hardware.audio) pop)))
-                      )))
-
-
-           
-          
-           )))
+           ,@setup-code)))
 
 (define (run)
   (compile-circ "tslib.py" (library-code))

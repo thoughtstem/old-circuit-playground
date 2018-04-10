@@ -2,7 +2,8 @@
 
 (require "./python.rkt")
 ;(require "./circuit-python-base.rkt")
-(require racket/draw)
+(require racket/draw
+         setup/dirs)
 
 (provide compile-circ
          run
@@ -22,8 +23,10 @@
          declare-imports
 
          add-to-hardware-update
-         ;(all-from-out "./circuit-python-base.rkt")
-         )
+
+         set-cplayboot-path!
+         set-circuitpy-path!
+         set-package-path!)
 
 
 
@@ -144,8 +147,45 @@
 (define (add-main-loop-code-begin . lines)
   (set-main-loop-code! (append lines main-loop-code)))
 
+(define (default-cplayboot-path)
+  (match (system-type 'os)
+    ('macosx    "/Volumes/CPLAYBOOT/")
+    ('unix      "/media/usb/")
+    ('windows   "D:/")))
+
+(define (default-circuitpy-path)
+  (match (system-type 'os)
+    ('macosx    "/Volumes/CIRCUITPY/")
+    ('unix      "/media/usb/")
+    ('windows   "D:/")))
+
+(define (default-package-path)
+  (string-append
+   (path->string (find-user-pkgs-dir))
+   "/circuit-python/"))
+
+(define cplayboot-path (default-cplayboot-path))
+(define circuitpy-path (default-circuitpy-path))
+(define package-path   (default-package-path))
+
+(define (set-cplayboot-path! s) (set! cplayboot-path s))
+(define (set-circuitpy-path! s) (set! circuitpy-path s))
+(define (set-package-path! s)   (set! package-path s))
+
+(define (cplayboot-mode?)
+  (and
+   (directory-exists? cplayboot-path)
+   (file-exists? (string-append cplayboot-path "INDEX.HTM"))))
+
+(define (circuitpy-mode?)
+  (and
+   (directory-exists? circuitpy-path)
+   (not (cplayboot-mode?))))
+
+(current-library-collection-paths)
+
 (define (compile-circ output p)
-  (define file-name (string-append "/Volumes/CIRCUITPY/" output))
+  (define file-name output)
   (with-output-to-file file-name #:exists 'replace
       (lambda () (printf (strip-hy-imports (compile-py p)))))
   (system (string-append "cat " file-name)))
@@ -222,10 +262,24 @@
            ,@setup-code)))
 
 (define (run)
- ; (compile-circ "tslib.py" (library-code))
+  (cond [(circuitpy-mode?) (simple-run)]
+        [(cplayboot-mode?) (full-flash)]
+        [else (raise "Where's the device?  You may need to plug it in.  Or find the path and call (set-cplayboot-path! s) and (set-circuitpy-path! s).")]))
 
-  (compile-circ "code.py"  (user-code)))
 
+(define (simple-run)
+  #;(compile-circ "tslib.py" (library-code))
+  (compile-circ
+   (string-append circuitpy-path "code.py")
+   (user-code)))
+
+(define (full-flash)
+  (copy-file
+   (string-append
+    package-path
+    "/tools/circuitpython/atmel-samd/build-circuitplayground_express/firmware.uf2")
+   (string-append cplayboot-path "firmware.uf2"))
+  "Device flashing.  Wait a moment and run your program again.")
 
 
 

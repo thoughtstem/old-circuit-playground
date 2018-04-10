@@ -1,9 +1,8 @@
-#lang racket
+#lang circuit-playground
 
-(require "../api/main.rkt")
+(on-start
+ (set-lights red)
+ (wait 2))
 
-
-(define-function (update)
-  (set-lights (->rgb "green")))
-
-(run) ;WART!
+(forever
+  (set-lights green))
