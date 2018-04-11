@@ -275,8 +275,8 @@
    (string-append circuitpy-path "code.py")
    (user-code))
   (and (is-linux?)
-   (system "sync"))
-   "Success!")
+   (system "ampy --port /dev/ttyACM0 reset & sleep 2 ; kill $!")) ;This makes the device pick up the changes immediately
+  "Success!")
 
 (define (full-flash)
   (copy-file
