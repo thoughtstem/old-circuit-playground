@@ -147,6 +147,9 @@
 (define (add-main-loop-code-begin . lines)
   (set-main-loop-code! (append lines main-loop-code)))
 
+(define (is-linux?)
+  (eq? (system-type 'os) 'unix))
+
 (define (default-cplayboot-path)
   (match (system-type 'os)
     ('macosx    "/Volumes/CPLAYBOOT/")
@@ -271,7 +274,8 @@
   (compile-circ
    (string-append circuitpy-path "code.py")
    (user-code))
-   (system (string-append "touch " circuitpy-path "code.py"))
+  (and (is-linux?)
+   (system "sync"))
    "Success!")
 
 (define (full-flash)
