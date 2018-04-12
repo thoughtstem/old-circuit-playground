@@ -274,6 +274,14 @@
   (compile-circ
    (string-append circuitpy-path "code.py")
    (user-code))
+
+  ;Uncomment to put the tslib.py file on the CPX.  Doesn't work, though, because CPX doesn't have enough RAM to
+  ; load the library.  I'll keep this here in case something changes.
+  #;(compile-circ
+   (string-append circuitpy-path "tslib.py")
+   (library-code))
+
+  
   (and (is-linux?)
    (system "ampy --port /dev/ttyACM0 reset & sleep 2 ; kill $!")) ;This makes the device pick up the changes immediately
   "Success!")

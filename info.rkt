@@ -1,4 +1,4 @@
 #lang info
 (define version "0.0.1")
 
-;(define scribblings '(("circuit-racket.scrbl" ())))
+(define scribblings '(("circuit-playground.scrbl" ())))

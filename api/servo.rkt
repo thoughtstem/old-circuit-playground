@@ -50,7 +50,7 @@
                          (string-split
                           (format "~a"
                                   (syntax->datum #'output_p))
-                          "_")))]
+                          "-")))]
                     [cap_p (string->symbol
                             (format "board.~a"
                                     (string->symbol

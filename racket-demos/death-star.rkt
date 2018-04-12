@@ -22,26 +22,26 @@
       (destroy-effect)
       #f))
 
-(on-down touch_a4
+(on-down touch-a4
          (set-lights green)
          (play-tone G4 0.1)
          (play-tone C5 0.1)
-         (pin-write output_a7 #t))
+         (pin-write output-a7 #t))
 
-(on-down touch_a5
+(on-down touch-a5
          (set-lights red)
          (play-tone G4 0.1)
          (play-tone C5 0.1)
-         (pin-write output_a7 #f))
+         (pin-write output-a7 #f))
 
-(on-down touch_a6
+(on-down touch-a6
          (repeat 10
-                 (pin-write output_a7 #t)
+                 (pin-write output-a7 #t)
                  (play-tone C5 0.1)
-                 (pin-write output_a7 #f)
+                 (pin-write output-a7 #f)
                  (play-tone C4 0.1)))
 
-(on-down touch_a3
+(on-down touch-a3
          (loop n 100
                  (play-tone (* 2 (+ 200 n)) 0.05)
                  (set-brightness (random))  
@@ -49,7 +49,7 @@
          (play-riff jingle1)
          (set! beam-start #t))
 
-(on-down touch_a1
+(on-down touch-a1
          (if beam-start
              (begin
                (play-riff jingle1)

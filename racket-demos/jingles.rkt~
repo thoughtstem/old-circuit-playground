@@ -1,8 +1,4 @@
-#lang racket
+#lang circuit-playground
 
-
-(require "../api/main.rkt")
-
-(define (setup)
- (set state.memory.team-color (->rgb "blue"))
- (play-riff (jingle1)))
+(forever
+ (play-riff jingle1))

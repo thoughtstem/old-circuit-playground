@@ -4,68 +4,37 @@
 (require "./circuit-python.rkt")
 
 (provide  on-down
-          on-up
-          BUTTON_A
-          BUTTON_B)
+          button_a
+          button_b
+          touch_a1
+          touch_a2
+          touch_a3
+          touch_a4
+          touch_a5
+          touch_a6
+          touch_a7)
 
-(declare-imports 'board 'time 'digitalio 'touchio)
+(declare-imports 'board 'time 'digitalio 'touchio 'express)
 
-(define BUTTON_A 'BUTTON_A)
-(define BUTTON_B 'BUTTON_B)
+(define button_a 'express.cpx.button_a)
+(define button_b 'express.cpx.button_b)
 
-(define (init-button-a)
-  `(do
-     (setv BUTTON_A (digitalio.DigitalInOut board.BUTTON_A))
-     (setv BUTTON_A.direction digitalio.Direction.INPUT)
-     (setv BUTTON_A.pull digitalio.Pull.DOWN)
-     (setv BUTTON_A_prev BUTTON_A.value)))
+(define touch_a1 'express.cpx.touch_A1)
+(define touch_a2 'express.cpx.touch_A2)
+(define touch_a3 'express.cpx.touch_A3)
+(define touch_a4 'express.cpx.touch_A4)
+(define touch_a5 'express.cpx.touch_A5)
+(define touch_a6 'express.cpx.touch_A6)
+(define touch_a7 'express.cpx.touch_A7)
 
-(define (init-button-b)
-  `(do
-     (setv BUTTON_B (digitalio.DigitalInOut board.BUTTON_B))
-     (setv BUTTON_B.direction digitalio.Direction.INPUT)
-     (setv BUTTON_B.pull digitalio.Pull.DOWN)
-     (setv BUTTON_B_prev BUTTON_B.value )))
-
-(define (init-pad-a1)
-  `(do
-     (setv PIN_A1 (touchio.TouchIn board.A1))
-     (setv PIN_A1_prev PIN_A1.value)))
-
-(add-setup-code
- (init-button-a)
- (init-button-b)
- (init-pad-a1))
-
-
-(define-function (update-buttons)
-  '(setv BUTTON_A_prev BUTTON_A.value)
-  '(setv BUTTON_B_prev BUTTON_B.value)
-  '(setv PIN_A1_prev PIN_A1.value)
-  (set state.hardware.BUTTON_A 'BUTTON_A.value)
-  (set state.hardware.BUTTON_B 'BUTTON_B.value)
-  (set state.hardware.A1       'PIN_A1.value))
-
-(add-main-loop-code-end
- (update-buttons))
 
 
 (define-syntax (on-down stx)
   (syntax-case stx ()
     [(_ b lines ...)
-     (with-syntax ([v (string->symbol (format "~a.value" (syntax->datum #'b)))]
-                   [p (string->symbol (format "~a_prev"  (syntax->datum #'b)))])
-       #`(add-main-loop-code-begin `(if (not (= v p))
-                                        (if v
-                                            ,lines ...))))]))
-
-(define-syntax (on-up stx)
-  (syntax-case stx ()
-    [(_ b lines ...)
-     (with-syntax ([v (string->symbol (format "~a.value" (syntax->datum #'b)))]
-                   [p (string->symbol (format "~a_prev" (syntax->datum #'b)))])
-       #`(add-main-loop-code-begin `(if (not (= v p))
-                                        (if (not v)
+     (with-syntax ([p (string->symbol (format "~a_prev"  (syntax->datum #'b)))])
+       #`(add-main-loop-code-begin `(if ,b
+                                        (do
                                             ,lines ...))))]))
 
 

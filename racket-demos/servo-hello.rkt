@@ -4,15 +4,15 @@
 
 (forever
   (print angle)
-  (set-servo output_a1 angle))  
+  (set-servo output-a1 angle))  
 
-(on-down button_a
+(on-down button-a
          (print "A")
          (set! angle 180))
 
-(on-down button_b
+(on-down button-b
          (print "B")
          (set! angle 0))
 
-(on-down touch_a7
+(on-down touch-a7
          (set! angle 90))

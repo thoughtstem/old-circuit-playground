@@ -9,11 +9,9 @@
          play-riff)
 
 
-(declare-imports 'audioio 'audiobusio 'array 'math)
+(declare-imports 'audioio 'audiobusio 'array 'math 'express)
 
 (add-setup-code
- '(setv already-played-list [hy-SQUARE])
-
  '(setv CURVE 2)
  '(setv SCALE_EXPONENT (math.pow 10 (* CURVE -0.1)))
 
@@ -31,10 +29,7 @@
  '(setv peak 0)
 
  '(setv SAMPLERATE 8000)
-
- '(setv spkrenable (digitalio.DigitalInOut board.SPEAKER_ENABLE))
- '(setv spkrenable.direction digitalio.Direction.OUTPUT)
- '(setv spkrenable.value True))
+ )
 
 
 
@@ -42,25 +37,17 @@
   `[hy-SQUARE [hy-SQUARE ,file ,id]])
 
 
-(define-function (play-tone beats freq)
-  '(if (= 0 freq)
+(define-function (play-tone freq beats)
+  ;self._speaker_enable = digitalio.DigitalInOut(board.SPEAKER_ENABLE)
+  ;self._speaker_enable.switch_to_output(value=False)
+  
+  '(if (not express.cpx._speaker_enable)
        (do
-           (time.sleep beats)
-           (return True)))
-  '(setv length (int (/ SAMPLERATE freq)))
-  '(setv sine_wave (array.array "H" (* [hy-SQUARE 0] length)))
-  '(for (i (range length))
-    (setv (hy-DOT sine_wave [hy-SQUARE i]) (+ (* (int (*
-                                                       (math.sin (/ (* math.pi 2 i) 18))
-                                                       (** 2 15))))
-                                              (** 2 15))))
+          (setv express.cpx._speaker_enable
+                (digitalio.DigitalInOut board.SPEAKER_ENABLE))
+          (express.cpx._speaker_enable.switch_to_output :value #f)))
+  '(express.cpx.play_tone freq beats))
 
-  '(setv sample (audioio.AudioOut board.SPEAKER sine_wave))
-  '(setv sample.frequency SAMPLERATE)
-  '(sample.play :loop True)  
-  '(time.sleep beats)          
-  '(sample.stop)
-  '(sample.deinit))
 
 (define-syntax (define-note stx)
   (syntax-case stx ()
@@ -119,8 +106,8 @@
 
 (define-function (play-riff riff)
   '(for (note riff)
-    (play-tone (hy-DOT note [hy-SQUARE 1])
-               (hy-DOT note [hy-SQUARE 0])) ))
+    (play-tone (hy-DOT note [hy-SQUARE 0])
+               (hy-DOT note [hy-SQUARE 1])) ))
     
 
 (define-function (constrain value floor ceiling)
@@ -150,7 +137,7 @@
   '(return (/ (sum values)
               (len values))))
 
-(define-function (mic-level )
+(define-function (mic-level)
   '(mic.record samples (len samples))
   '(setv magnitude (normalized_rms samples))
   '(setv c (log_scale
@@ -161,15 +148,3 @@
            10))
   'c)
 
-(define-function (hardware-update-sound)
-  (set state.hardware.audio '[hy-SQUARE ])
-  (set state.hardware.mic-level (mic-level)))
-
-(add-to-hardware-update
-  '(hardware-update-sound))
-
-(define-function (already-played id)
-  '(for (p already-played-list)
-    (if (= p id)
-        (return True)))
-  '(return False))

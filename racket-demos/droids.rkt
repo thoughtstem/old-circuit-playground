@@ -6,12 +6,12 @@
   (set-brightness (random))
   (wait (/ (random) 20))
   (set-lights main-color)
-  (set-servo output_a1 90))
+  (set-servo output-a1 90))
 
 (define (angry)
   (repeat (int (* 12 (random)))
           (set-brightness 1)
-          (set-servo output_a1 (* 180 (random)))
+          (set-servo output-a1 (* 180 (random)))
           (set-lights red)
           (wait 0.025)
           (set-lights black)
@@ -19,14 +19,14 @@
                      0.1)
           (wait 0.01))
   (wait 0.5)
-  (set-servo output_a1 90))
+  (set-servo output-a1 90))
 
 (on-start
   (play-riff jingle1)
   (set-brightness 0.5)
   (set! main-color blue)
   (set-lights main-color)
-  (set-servo output_a1 90))
+  (set-servo output-a1 90))
 
 (forever
   (if (shake 10)

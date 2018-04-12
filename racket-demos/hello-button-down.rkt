@@ -1,14 +1,11 @@
 #lang circuit-playground
 
-;Global variable
 (define color blue)
 
 (forever
- (if button_b ;You can check a button val whenever you want....
+ (if button-b 
      (set-lights green)
      (set-lights color)))
 
-;Or you can register an event to happen when a button
-; val changes...
-(on-down button_a
+(on-down button-a
          (set! color red))
