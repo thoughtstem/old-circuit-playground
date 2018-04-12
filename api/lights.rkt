@@ -5,12 +5,16 @@
 (require racket/draw)
 
 (provide  dim-color-by
+          color-from-hue
+          light-level
           ->rgb)
 
 
 
 
 (declare-imports 'neopixel 'digitalio)
+
+(define (light-level) 'express.cpx.light)
 
 (add-setup-code
  '(setv pixpin board.NEOPIXEL)
@@ -28,12 +32,58 @@
 
 (define-function (set-light n c)
   '(setv (hy-DOT express.cpx.pixels [hy-SQUARE n])
+         c)
+  `(express.cpx.pixels.show))
+
+(define-function (set-light-wait n c)
+  '(setv (hy-DOT express.cpx.pixels [hy-SQUARE n])
          c))
+
+(define-function (show-lights)
+  `(express.cpx.pixels.show))
 
 (define-function (set-lights c)
   (loop n 10
-    `(set-light n c))
+    `(set-light-wait n c))
   `(express.cpx.pixels.show))
+
+(define-function (color-from-hue hue)
+  '(setv hue-adj (% hue 255))
+  '(if
+    (< hue-adj 42.5)  (hy-COMMA 255
+                                (* hue-adj 6)
+                                0)
+    (< hue-adj 85)    (hy-COMMA (- 255 (round (* (- hue-adj 42.5) 6)))
+                                255
+                                0)
+    (< hue-adj 127.5) (hy-COMMA 0
+                                255
+                                (round (* (- hue-adj 85) 6)))
+    (< hue-adj 170)   (hy-COMMA 0
+                                (- 255 (round (* (- hue-adj 127.5) 6)))
+                                255)
+    (< hue-adj 212.5) (hy-COMMA (round (* (- hue-adj 170) 6))
+                                   0
+                                   255)
+    (hy-COMMA 255
+              0
+              (- 255 (round (* (- hue-adj 212.5) 6))))))
+
+#;(define/contract (make-color-hue-equal-brightness hue a)
+  (-> number? number? color?)
+  (cond
+    [(< hue 85)  (make-color (- 255 (* hue 3))
+                             (* hue 3)
+                              0
+                              a)]
+    [(< hue 170) (make-color  0
+                              (- 255 (* (- hue 85) 3))
+                              (* (- hue 85) 3)
+                              a)]
+    [else        (make-color  (* (- hue 170) 3)
+                              0
+                              (- 255 (* (- hue 170) 3))
+                              a)]))
 
 
 (define (->rgb color)

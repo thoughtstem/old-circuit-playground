@@ -189,6 +189,73 @@ All colors in the list below are available for use in any call to set-lights.
   black)
 }|
 
+@section{More Lights}
+
+@codeblock|{
+#lang circuit-playground
+
+(define (fx1 c1 c2)
+  (set-light 0 c1)
+  (set-light 1 c1)
+  (set-light 2 c1)
+  (set-light 3 c1)
+  (set-light 4 c1)
+  (set-light 5 c2)
+  (set-light 6 c2)
+  (set-light 7 c2)
+  (set-light 8 c2)
+  (set-light 9 c2))
+
+(forever
+ (fx1 red blue)
+ (wait 0.5)
+ (fx1 blue red)
+ (wait 0.5))
+}|
+
+You can control each light individually and make cool patterns!
+
+@image[#:scale 1]{./doc-images/SirenDemo.gif}
+
+@section{Rainbow Sparkles}
+
+@codeblock|{
+#lang circuit-playground
+
+(define rainbow-step 0)
+(define rainbow-speed 10)
+(define rainbow-dist 10)
+(define sparkle-time 150)
+
+(define (rainbow)
+  (set-light 0 (color-from-hue (+ rainbow-step (* 0 rainbow-dist))))
+  (set-light 1 (color-from-hue (+ rainbow-step (* 1 rainbow-dist))))
+  (set-light 2 (color-from-hue (+ rainbow-step (* 2 rainbow-dist))))
+  (set-light 3 (color-from-hue (+ rainbow-step (* 3 rainbow-dist))))
+  (set-light 4 (color-from-hue (+ rainbow-step (* 4 rainbow-dist))))
+  (set-light 5 (color-from-hue (+ rainbow-step (* 5 rainbow-dist))))
+  (set-light 6 (color-from-hue (+ rainbow-step (* 6 rainbow-dist))))
+  (set-light 7 (color-from-hue (+ rainbow-step (* 7 rainbow-dist))))
+  (set-light 8 (color-from-hue (+ rainbow-step (* 8 rainbow-dist))))
+  (set-light 9 (color-from-hue (+ rainbow-step (* 9 rainbow-dist))))
+  (set! rainbow-step (% (+ rainbow-speed rainbow-step) 255)))
+
+(define (sparkles)
+  (repeat sparkle-time
+          (set-lights black)
+          (set-light (pick-random 0 10) white)))
+
+(forever
+ (if (shake 15)
+     (sparkles)
+     (rainbow))) 
+}|
+
+It's a rainbow until I shake it gently.  Then it sparkles!
+
+@image[#:scale 1]{./doc-images/Rainbow.gif}
+
+
 
 @section{Basic Buttons}
 
@@ -209,6 +276,100 @@ All colors in the list below are available for use in any call to set-lights.
 
 
 @image[#:scale 1]{./doc-images/ButtonPressDemo.gif}
+
+
+@section{Detecting Volume Level}
+
+
+@codeblock|{
+#lang circuit-playground
+
+(define (show-volume level)
+  (set-lights black)
+  (loop n level
+        (set-light n red)))
+
+(forever
+ (show-volume (mic-level)))
+}|
+
+
+@image[#:scale 2]{./doc-images/LevelDemo.gif}
+
+
+@section{Hot Potato}
+
+
+@codeblock|{
+#lang circuit-playground
+
+(define delay 10)
+
+(on-down button-a
+         (set! delay (+ 20 (pick-random 0 10)))
+         (set-lights green)
+         (while (< 0 delay)
+                (set! delay (- delay 1))
+                (play-tone A5 0.1)
+                (wait (min 10 (/ delay 5))))
+         (play-tone G4 0.5)
+         (set-lights red))   
+}|
+
+When we have kids code this one in class, we end the day by throwing the CPXs around
+a circle in a fun game of Hot Potato.
+
+
+@section{Clap Light}
+
+@codeblock|{
+#lang circuit-playground
+
+(define on-color white)
+(define off-color black)
+(define lights #t)
+
+(define (toggle-lights)
+  (set! lights (not lights))
+  (wait 1))
+
+(define (show-lights)
+  (if lights
+      (set-lights on-color)
+      (set-lights off-color)))
+
+(forever
+ (if (>= (mic-level) 5)
+     (toggle-lights)
+     #f)
+ (show-lights))
+}|
+
+@image[#:scale 1]{./doc-images/ClapLight2.gif}
+
+
+@section{Night light}
+
+@codeblock|{
+#lang circuit-playground
+
+(define lights-on #f)
+(define thresh 100)
+
+(forever
+ (if lights-on
+     (set-lights white)
+     (set-lights black))
+ (if (< (light-level) thresh)
+     (set! lights-on #t)
+     #f))
+}|
+
+You may have to experiment with the threshold value depending on the
+light level in your room.
+
+@image[#:scale 1]{./doc-images/NightLight.gif}
+
 
 
 @section{Basic Sound}

@@ -13,6 +13,3 @@
 (on-down button-b
          (print "B")
          (set! angle 0))
-
-(on-down touch-a7
-         (set! angle 90))

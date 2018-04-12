@@ -5,6 +5,7 @@
 
 
 (require (for-syntax racket))
+(require (for-syntax racket/syntax))
 
 
 (provide 
@@ -12,7 +13,7 @@
 
          wait
          
-         pick-random
+         py-set
 
          get
          set
@@ -37,11 +38,9 @@
 
 
 (define (wait t)
-  `(do (render)
-       (time.sleep ,t)))
+  `(do (time.sleep ,t)
+       (express.cpx.pixels.show)))
 
-(define (pick-random (s 0) (e 1))
-  `(int (+ ,s (* ,e (random.random)))))
 
 (define-for-syntax (split-dots syntax)
   (define (fix-numbers s)
@@ -88,13 +87,21 @@
        #`(set2 (f r) other))]))
 
 
+(define-syntax (py-set stx)
+  (syntax-case stx ()
+    [(_ var-name other)
+     (with-syntax []
+       #`(begin
+           (set! var-name 'var-name)
+           `(setv var-name ,other)))]))
+
 
 (define-syntax (loop stx)
   (syntax-case stx ()
     [(_ var max lines ...)
      (with-syntax ()
        #`(let ([var 'n])
-           (quasiquote (for (var (range max))
+           (quasiquote (for (var (range ,max))
                        ,lines ...))))]))
 
 (define-syntax (repeat stx)

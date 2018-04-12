@@ -18,6 +18,7 @@
          get
          set
          loop
+         while
          repeat
          (rename-out [py-if if])
          ;(rename-out [py-begin begin])
@@ -95,6 +96,12 @@
            (set! var-name 'var-name)
            `(setv var-name ,other)))]))
 
+(define-syntax (while stx)
+  (syntax-case stx ()
+    [(_ condition lines ...)
+     (with-syntax ()
+       #`(quasiquote (while ,condition
+                            ,lines ...)))]))
 
 (define-syntax (loop stx)
   (syntax-case stx ()
@@ -138,7 +145,9 @@
 (define-op py-mul *)
 (define-op py-div /)
 (define-op py-mod %)
+(define-op py-min min)
 
+(define-op py-max max)
 (define-op py-not not)
 
 (define-op py-time-sleep time.sleep)
