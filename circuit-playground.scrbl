@@ -37,7 +37,7 @@ features.
 This sets the neopixel lights to red when the CPX boots.  Two seconds later, the lights turn
 blue.
 
-@image[#:scale 1]{./doc-images/RedBlue.gif}
+@image[#:scale 1]{./doc-images/RedBlueSmall.gif}
 
 All colors in the list below are available for use in any call to set-lights.
 
@@ -215,7 +215,7 @@ All colors in the list below are available for use in any call to set-lights.
 
 You can control each light individually and make cool patterns!
 
-@image[#:scale 1]{./doc-images/SirenDemo.gif}
+@image[#:scale 1]{./doc-images/SirenDemoSmall2.gif}
 
 @section{Rainbow Sparkles}
 
@@ -253,7 +253,7 @@ You can control each light individually and make cool patterns!
 
 It's a rainbow until I shake it gently.  Then it sparkles!
 
-@image[#:scale 1]{./doc-images/Rainbow.gif}
+@image[#:scale 1]{./doc-images/RainbowSmall2.gif}
 
 
 
@@ -275,7 +275,7 @@ It's a rainbow until I shake it gently.  Then it sparkles!
 }|
 
 
-@image[#:scale 1]{./doc-images/ButtonPressDemo.gif}
+@image[#:scale 1]{./doc-images/ButtonPressDemoSmall.gif}
 
 
 @section{Detecting Volume Level}
@@ -294,7 +294,7 @@ It's a rainbow until I shake it gently.  Then it sparkles!
 }|
 
 
-@image[#:scale 2]{./doc-images/LevelDemo.gif}
+@image[#:scale 1]{./doc-images/LevelDemoSmall.gif}
 
 
 @section{Hot Potato}
@@ -345,7 +345,7 @@ a circle in a fun game of Hot Potato.
  (show-lights))
 }|
 
-@image[#:scale 1]{./doc-images/ClapLight2.gif}
+@image[#:scale 1]{./doc-images/ClapLight2Small.gif}
 
 
 @section{Night light}
@@ -368,7 +368,7 @@ a circle in a fun game of Hot Potato.
 You may have to experiment with the threshold value depending on the
 light level in your room.
 
-@image[#:scale 1]{./doc-images/NightLight.gif}
+@image[#:scale 1]{./doc-images/NightLightSmall.gif}
 
 
 
@@ -394,7 +394,7 @@ When it comes to sound, we can play tones and custom "riffs".
 
 No sound in GIFs.  You'll have to take my word that it works. :)
 
-@image[#:scale 1]{./doc-images/SoundDemo.gif}
+@image[#:scale 1]{./doc-images/SoundDemoSmall.gif}
 
 
 @section{Intermediate: LED write + Capacative touch}
@@ -423,7 +423,7 @@ I'm using American Sign Language to try to help clarify that I'm attaching the r
 to pin A7 and the green wire to GND.  I then speed up the blinking LED by touching the 
 A1 pad.  
 
-@image[#:scale 1]{./doc-images/LEDCapDemo.gif}
+@image[#:scale 1]{./doc-images/LEDCapDemoSmall.gif}
 
 
 @section{Intermediate: Laser Tag}
@@ -459,7 +459,7 @@ In the GIF below, I press the button on one CPX and the other CPX turns red.  It
 but it works the second time.  This is pretty common.  IR sending/receiving does not have 100% 
 accuracy.  The ambient light in the room can affect things greatly.
 
-@image[#:scale 1]{./doc-images/IRDemo.gif}
+@image[#:scale 1]{./doc-images/IRDemoSmall.gif}
 
 
 @section{Intermediate: Servo Control}
@@ -485,4 +485,4 @@ GND, one connects to 3.3v, the other connects to the control pin (which in this 
 Depending on your servo, it can be hard to tell which wire is which.  To be honest, I usually just do trial and error 
 to figure that out.
 
-@image[#:scale 1]{./doc-images/ServoDemo.gif}
+@image[#:scale 1]{./doc-images/ServoDemoSmall.gif}
