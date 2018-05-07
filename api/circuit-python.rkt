@@ -277,7 +277,7 @@
 
   ;Uncomment to put the tslib.py file on the CPX.  Doesn't work, though, because CPX doesn't have enough RAM to
   ; load the library.  I'll keep this here in case something changes.
-  #;(compile-circ
+  (compile-circ
    (string-append circuitpy-path "tslib.py")
    (library-code))
 

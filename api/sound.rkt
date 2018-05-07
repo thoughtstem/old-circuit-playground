@@ -123,9 +123,12 @@
 
   '(for (i (range (len values)))
      (setv sample (hy-DOT values [hy-SQUARE i]))
-     (setv curr (float (* (- sample minbuf) (- sample minbuf))))
-     (setv sum (+ sum curr))
-     )
+     
+     (setv curr
+           (if (>= (- sample minbuf) 32700)
+               (* 32700 32700)
+               (float (* (- sample minbuf) (- sample minbuf)))))
+     (setv sum (+ sum curr)))
   
   '(return (math.sqrt
            (/
@@ -139,6 +142,7 @@
 (define-function (mic-level)
   '(mic.record samples (len samples))
   '(setv magnitude (normalized_rms samples))
+  
   '(setv c (log_scale
            (constrain magnitude input_floor input_ceiling)
            input_floor

@@ -5,8 +5,8 @@
 
 
 
-(provide play-once
-         play-riff)
+(provide play-riff
+         define-riff)
 
 
 (declare-imports 'audioio 'audiobusio 'array 'math 'express)
@@ -33,13 +33,12 @@
 
 
 
-(define (play-once file id)
-  `[hy-SQUARE [hy-SQUARE ,file ,id]])
 
 
 (define-function (play-tone freq beats)
-  ;self._speaker_enable = digitalio.DigitalInOut(board.SPEAKER_ENABLE)
-  ;self._speaker_enable.switch_to_output(value=False)
+  '(if (= 0 freq)
+       (do (time.sleep beats)
+           (return)))
   
   '(if (not express.cpx._speaker_enable)
        (do
