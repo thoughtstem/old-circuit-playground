@@ -125,7 +125,7 @@
      (setv sample (hy-DOT values [hy-SQUARE i]))
      
      (setv curr
-           (if (>= (- sample minbuf) 32700)
+           (if (>= (abs (- sample minbuf)) 32700)
                (* 32700 32700)
                (float (* (- sample minbuf) (- sample minbuf)))))
      (setv sum (+ sum curr)))

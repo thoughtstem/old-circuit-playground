@@ -9,5 +9,7 @@ If you make big changes to the api, you'll need to rebuild the firmware.  Not a 
 * Make sure the compiler outputs tslib.py to the CPX (edit circuit-playground.rkt)
 * Make sure the arm gcc is on your path
 * Run ./scripts/redo-firmware.rb
-* Commit the new firmware to github
+* Put the CPX into bootloader mode, put ./tools/firmware.uf2 onto the CPX
+
+* If all is good, commit the new firmware to github
 
