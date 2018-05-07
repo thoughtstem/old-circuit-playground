@@ -163,7 +163,7 @@
 
 
 (define (update . lines)
-  `(defn update (state)
+  `(defn update [hy-SQUARE state]
      ,@lines))
 
 

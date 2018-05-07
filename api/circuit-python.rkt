@@ -45,7 +45,7 @@
             
             (append (list
                      (let ([params 'params] ...)
-                       (quasiquote (defn name (params ...)
+                       (quasiquote (defn name [hy-SQUARE params ...]
                                      (do
                                          ;(global state)
                                          ,lines ...)
@@ -71,7 +71,7 @@
             
             (append (list
                      (let ([params 'params] ...)
-                       (quasiquote (defn name (params ...)
+                       (quasiquote (defn name [hy-SQUARE params ...]
                                      (do
                                          
                                          ,lines ...)
@@ -118,7 +118,7 @@
 
 (define global-vars '())
 
-;fns is a list of hy dfns e.g. (defn update () (print "hi") (print "HI again"))
+;fns is a list of hy dfns e.g. (defn update [] (print "hi") (print "HI again"))
 (define (function-names fns)
   (map second fns))  
 
@@ -222,7 +222,7 @@
 
 (define (add-function-if-not-there name)
   (or  (member name (function-names user-functions))
-       (add-user-function `(defn ,name ()))))
+       (add-user-function `(defn ,name [hy-SQUARE]))))
 
 
 
@@ -242,7 +242,7 @@
   (list `(
            (import express)
            (import tslib)
-           (import [tslib [*]])
+           (import [hy-SQUARE tslib [hy-SQUARE *]])
            
            ,@global-vars
            ,@(shove-in-globals user-functions)
