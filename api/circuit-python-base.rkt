@@ -21,6 +21,7 @@
          while
          repeat
          (rename-out [py-if if])
+         py-cond
          ;(rename-out [py-begin begin])
          py-begin ;Causes issues to redefine begin here.  Maybe it'll work farther downstream
          (rename-out [py-random random])
@@ -120,6 +121,18 @@
 
 (define (py-if c t f)
   `(if ,c ,t ,f))
+
+(define-syntax (py-cond stx)
+  (syntax-case stx (else)
+    [(_ (condition result) ... (else else-result))
+     (with-syntax ()
+       #`(quasiquote (cond
+                       (hy-SQUARE ,condition ,result) ... (hy-SQUARE #t ,else-result))))]
+    [(_ (condition result) ...)
+     (with-syntax ()
+       #`(quasiquote (cond
+                       (hy-SQUARE ,condition ,result) ...)))]
+    ))
 
 (define-syntax (py-begin stx)
   (syntax-case stx ()

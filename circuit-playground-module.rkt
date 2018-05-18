@@ -11,12 +11,14 @@
    (all-from-out "./api/servo.rkt")
    (all-from-out "./api/ir.rkt")
    (rename-out [py-begin begin]
-               [py-set set!])
+               [py-set set!]
+               [py-cond cond])
    (rename-out [define-user-function define])
    (except-out (all-from-out racket)
                begin
                define
-               set!)
+               set!
+               cond)
    #%module-begin)
 
 
