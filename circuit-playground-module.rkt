@@ -10,6 +10,8 @@
    (all-from-out "./api/accel.rkt")
    (all-from-out "./api/servo.rkt")
    (all-from-out "./api/ir.rkt")
+   (all-from-out "./api/rgb_helper.rkt")
+   
    (rename-out [py-begin begin]
                [py-set set!]
                [py-cond cond])
@@ -30,5 +32,6 @@
   (require "./api/output.rkt")
   (require "./api/accel.rkt")
   (require "./api/servo.rkt")
-  (require "./api/ir.rkt"))
+  (require "./api/ir.rkt")
+  (require "./api/rgb_helper.rkt"))
 

@@ -160,6 +160,9 @@
 (define-op py-mod %)
 (define-op py-min min)
 
+(define-op py-and and)
+(define-op py-or or)
+
 (define-op py-max max)
 (define-op py-not not)
 

@@ -1,0 +1,41 @@
+#lang racket
+
+(provide rgb->hue
+         )
+
+
+#;(define (hue-from-rgb red green blue)
+  '(setv r (/ red 255))
+  '(setv g (/ green 255))
+  '(setv b (/ blue 255))
+  '(setv mx (max r g b))
+  '(setv mn (min r g b))
+  '(setv d (- mx mn))
+  '(if
+    (= mx mn) (exact-round (* 0 42.5))
+    (= mx r)  (exact-round (* (+ (/ (- g b) d) (if (< g b) 6 0)) 42.5))
+    (= mx g)  (exact-round (* (+ (/ (- b r) d) 2) 42.5))
+    (= mx b)  (exact-round (* (+ (/ (- r g) d) 4) 42.5))
+                 ))
+
+(define (rgb->hue red green blue)
+  (define r (/ red 255))
+  (define g (/ green 255))
+  (define b (/ blue 255))
+  (define mx (max r g b))
+  (define mn (min r g b))
+  (define d (- mx mn))
+  (cond
+    [(= mx mn) (define h 0)
+                 (exact-round (* h 42.5))]
+    [(= mx r)   (define h (+ (/ (- g b) d) (if (< g b) 6 0)))
+                 (exact-round (* h 42.5))]
+    [(= mx g)   (define h (+ (/ (- b r) d) 2))
+                 (exact-round (* h 42.5))]
+    [(= mx b)   (define h (+ (/ (- r g) d) 4))
+                 (exact-round (* h 42.5))]))
+
+(define (name->hue name)
+  (rgb->hue (->rgb name)
+            (->rgb name)
+            (->rgb name)))
