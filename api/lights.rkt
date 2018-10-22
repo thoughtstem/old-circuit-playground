@@ -9,9 +9,6 @@
           light-level
           ->rgb)
 
-
-
-
 (declare-imports 'neopixel 'digitalio)
 
 (define (light-level) 'express.cpx.light)
@@ -84,7 +81,6 @@
                               0
                               (- 255 (* (- hue 170) 3))
                               a)]))
-
 
 (define (->rgb color)
   (if (string? color)

@@ -10,14 +10,18 @@
    (all-from-out "./api/accel.rkt")
    (all-from-out "./api/servo.rkt")
    (all-from-out "./api/ir.rkt")
+   (all-from-out "./api/rgb_helper.rkt")
    (rename-out [begin racket-begin])
+   
    (rename-out [py-begin begin]
-               [py-set set!])
+               [py-set set!]
+               [py-cond cond])
    (rename-out [define-user-function define])
    (except-out (all-from-out racket)
                begin
                define
-               set!)
+               set!
+               cond)
    #%module-begin)
 
 
@@ -29,5 +33,6 @@
   (require "./api/output.rkt")
   (require "./api/accel.rkt")
   (require "./api/servo.rkt")
-  (require "./api/ir.rkt"))
+  (require "./api/ir.rkt")
+  (require "./api/rgb_helper.rkt"))
 
