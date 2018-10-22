@@ -10,6 +10,7 @@
    (all-from-out "./api/accel.rkt")
    (all-from-out "./api/servo.rkt")
    (all-from-out "./api/ir.rkt")
+   (rename-out [begin racket-begin])
    (rename-out [py-begin begin]
                [py-set set!])
    (rename-out [define-user-function define])
