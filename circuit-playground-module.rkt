@@ -13,7 +13,7 @@
    (all-from-out "./api/rgb_helper.rkt")
    (rename-out [begin racket-begin])
    
-   (rename-out [py-begin begin]
+   (rename-out [fancy-begin begin]
                [py-set set!]
                [py-cond cond])
    (rename-out [define-user-function define])
@@ -25,6 +25,17 @@
    #%module-begin)
 
 
+  (require (for-syntax racket))
+  (define-syntax (fancy-begin stx)
+    (define full-s (~a (syntax->datum stx)))
+    (define inners (rest (syntax->datum stx)))
+
+    (if (string-contains? full-s "(require ")
+        #`(r:begin #,@inners)
+        #`(py-begin #,@inners)))
+    
+
+  (require (prefix-in r: racket))
   (require "./installer.rkt")
   (require "./api/circuit-python-base.rkt")
   (require "./api/circuit-python.rkt")
